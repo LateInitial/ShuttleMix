@@ -1,536 +1,848 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShuttleMix</title>
-  <style>
-    :root {
-      --bg: #eef4ff;
-      --panel: #ffffff;
-      --card: #f5f8ff;
-      --text: #1b2340;
-      --muted: #5f6d94;
-      --accent: #4f6fff;
-      --ok: #dff6e8;
-      --ok-border: #7ecfa0;
-      --skip: #fde7e8;
-      --skip-border: #ef9ba0;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(circle at top, #dbe8ff, var(--bg) 48%);
-      color: var(--text);
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-    }
-    .device {
-      width: min(980px, 100%);
-      background: #e7eeff;
-      border-radius: 26px;
-      padding: 10px;
-      border: 1px solid #c8d5fb;
-      box-shadow: 0 14px 32px rgba(49, 79, 157, 0.2);
-      min-height: 650px;
-      resize: both;
-      overflow: auto;
-      min-width: 320px;
-    }
-    .screen {
-      background: linear-gradient(180deg, #fafdff, #eef4ff);
-      border-radius: 20px;
-      min-height: 630px;
-      border: 1px solid #d2ddfb;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .top { padding: 14px 16px 10px; border-bottom: 1px solid #d8e2ff; }
-    .title { font-size: 28px; line-height: 1; margin: 0; }
-    .subtitle { margin-top: 4px; color: var(--muted); font-size: 14px; }
-    .tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border-bottom: 1px solid #d8e2ff;
-    }
-    .tab {
-      text-align: center;
-      padding: 12px 6px;
-      color: #6f7ca3;
-      font-size: 14px;
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-    }
-    .tab.active { color: #4f6fff; border-bottom: 2px solid #4f6fff; font-weight: 700; }
-    .view { display: none; padding: 14px; gap: 12px; }
-    .view.active { display: grid; }
-    .toolbar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .toolbar input {
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid #cbd8ff;
-      background: #fff;
-      color: var(--text);
-    }
-    .toolbar .name-input { min-width: 180px; }
-    .toolbar .skill-input { width: 90px; }
-    .card {
-      background: var(--panel);
-      border: 1px solid #d8e3ff;
-      border-radius: 14px;
-      padding: 12px;
-    }
-    .table-scroll {
-      width: 100%;
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 4px;
-      touch-action: pan-x pan-y;
-    }
-    .table-inner {
-      width: 100%;
-      min-width: 0;
-    }
-    .header-row, .row {
-      display: grid;
-      grid-template-columns: 28px minmax(96px, 1.75fr) 44px 34px 58px 46px 38px;
-      align-items: center;
-      gap: 4px;
-    }
-    .header-row {
-      color: #6a769f;
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      padding: 0 10px 6px;
-    }
-    .row {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 10px;
-      border: 1px solid #e1e9ff;
-      margin-top: 6px;
-    }
-    .row.priority { background: linear-gradient(90deg, #e6f8ee, #dcf4e7); border-color: var(--ok-border); }
-    .row.skip { background: linear-gradient(90deg, #feeff0, #fde6e8); border-color: var(--skip-border); }
-    .name { font-weight: 600; }
-    .skill { color: #4f6fff; font-weight: 700; }
-    .col-skill {
-      text-align: left;
-      justify-self: start;
-    }
-    .col-games { text-align: center; }
-    .col-priority,
-    .col-skip {
-      text-align: center;
-      justify-self: center;
-    }
-    .col-actions { text-align: right; }
-    .toggle-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .danger { background: #d9585f; }
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 9px 10px;
-      font-weight: 600;
-      color: #fff;
-      background: #6f84d7;
-      cursor: pointer;
-    }
-    button.primary { background: var(--accent); }
-    button.secondary { background: #7c8ab8; }
-    button.small { padding: 5px 6px; font-size: 11px; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .pair-grid {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 10px;
-      align-items: center;
-      margin-top: 8px;
-    }
-    .pair { background: #eef3ff; border-radius: 10px; padding: 10px; min-height: 110px; }
-    .tag {
-      display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; margin: 3px 3px 0 0;
-      background: #e5ecff; color: #3b4e84;
-    }
-    .tag.good { background: #dcf4e7; color: #246547; }
-    .tag.warn { background: #fff0d8; color: #8d5f1f; }
-    .history-item {
-      border-left: 3px solid #4f6fff;
-      padding: 8px 10px;
-      background: #eef3ff;
-      border-radius: 8px;
-      margin-top: 8px;
-    }
-    @media (max-width: 760px) {
-      body {
-        padding: 0;
-        display: block;
-      }
-      .device {
-        width: 100%;
-        min-width: 0;
-        min-height: 100vh;
-        border-radius: 0;
-        border: 0;
-        padding: 0;
-        box-shadow: none;
-        resize: none;
-      }
-      .screen {
-        min-height: 100vh;
-        border-radius: 0;
-        border: 0;
-      }
-      .view { padding: 10px; }
-      .card { padding: 10px; border-radius: 12px; }
-      .table-inner { width: max-content; min-width: 100%; }
-      .header-row, .row {
-        font-size: 12px;
-        grid-template-columns: 24px minmax(86px, 1.65fr) 40px 30px 54px 42px 34px;
-        gap: 2px;
-      }
-      button.small { padding: 4px 5px; font-size: 10px; }
-      .pair-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShuttleMix</title>
+<style>
+:root {
+--bg: #eef4ff;
+--panel: #ffffff;
+--card: #f5f8ff;
+--text: #1b2340;
+--muted: #5f6d94;
+--accent: #4f6fff;
+--ok: #dff6e8;
+--ok-border: #7ecfa0;
+--skip: #fde7e8;
+--skip-border: #ef9ba0;
+}
+* { box-sizing: border-box; }
+body {
+margin: 0;
+font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+background: radial-gradient(circle at top, #dbe8ff, var(--bg) 48%);
+color: var(--text);
+min-height: 100vh;
+display: grid;
+place-items: center;
+padding: 18px;
+}
+.device {
+width: min(980px, 100%);
+background: #e7eeff;
+border-radius: 26px;
+padding: 10px;
+border: 1px solid #c8d5fb;
+box-shadow: 0 14px 32px rgba(49, 79, 157, 0.2);
+min-height: 650px;
+resize: both;
+overflow: auto;
+min-width: 320px;
+}
+.screen {
+background: linear-gradient(180deg, #fafdff, #eef4ff);
+border-radius: 20px;
+min-height: 630px;
+border: 1px solid #d2ddfb;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+}
+.top { padding: 14px 16px 10px; border-bottom: 1px solid #d8e2ff; }
+.title { font-size: 28px; line-height: 1; margin: 0; }
+.subtitle { margin-top: 4px; color: var(--muted); font-size: 14px; }
+.tabs {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+border-bottom: 1px solid #d8e2ff;
+}
+.tab {
+text-align: center;
+padding: 12px 6px;
+color: #6f7ca3;
+font-size: 14px;
+border: 0;
+background: transparent;
+cursor: pointer;
+}
+.tab.active { color: #4f6fff; border-bottom: 2px solid #4f6fff; font-weight: 700; }
+.view { display: none; padding: 14px; gap: 12px; }
+.view.active { display: grid; }
+.toolbar {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+align-items: center;
+}
+.toolbar input {
+padding: 8px 10px;
+border-radius: 10px;
+border: 1px solid #cbd8ff;
+background: #fff;
+color: var(--text);
+}
+.toolbar .name-input { min-width: 180px; }
+.toolbar .skill-input { width: 90px; }
+
+/* Highlight toolbar when in edit mode */
+.toolbar.editing-mode .name-input,
+.toolbar.editing-mode .skill-input {
+border-color: #4f6fff;
+box-shadow: 0 0 0 2px rgba(79,111,255,0.18);
+background: #f0f4ff;
+}
+.edit-mode-hint {
+display: none;
+font-size: 12px;
+color: #4f6fff;
+font-weight: 600;
+align-self: center;
+}
+.toolbar.editing-mode .edit-mode-hint {
+display: inline;
+}
+
+.card {
+background: var(--panel);
+border: 1px solid #d8e3ff;
+border-radius: 14px;
+padding: 12px;
+}
+.table-scroll {
+width: 100%;
+overflow-x: auto;
+overflow-y: hidden;
+-webkit-overflow-scrolling: touch;
+padding-bottom: 4px;
+touch-action: pan-x pan-y;
+}
+.table-inner {
+width: 100%;
+min-width: 0;
+}
+.header-row, .row {
+display: grid;
+grid-template-columns: 28px minmax(96px, 1.75fr) 44px 34px 58px 46px 70px;
+align-items: center;
+gap: 4px;
+}
+.header-row {
+color: #6a769f;
+font-weight: 600;
+font-size: 12px;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+padding: 0 10px 6px;
+}
+.row {
+background: var(--card);
+border-radius: 12px;
+padding: 10px;
+border: 1px solid #e1e9ff;
+margin-top: 6px;
+transition: background 0.15s, border-color 0.15s;
+}
+.row.priority { background: linear-gradient(90deg, #e6f8ee, #dcf4e7); border-color: var(--ok-border); }
+.row.skip { background: linear-gradient(90deg, #feeff0, #fde6e8); border-color: var(--skip-border); }
+.row.editing {
+background: linear-gradient(90deg, #eef2ff, #e8edff) !important;
+border-color: #4f6fff !important;
+box-shadow: 0 0 0 2px rgba(79,111,255,0.15);
+}
+.name { font-weight: 600; }
+.skill { color: #4f6fff; font-weight: 700; }
+.col-skill {
+text-align: left;
+justify-self: start;
+}
+.col-games { text-align: center; }
+.col-priority,
+.col-skip {
+text-align: center;
+justify-self: center;
+}
+.col-actions {
+text-align: right;
+display: flex;
+gap: 3px;
+justify-content: flex-end;
+align-items: center;
+}
+.toggle-wrap {
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.danger { background: #d9585f; }
+button {
+border: 0;
+border-radius: 10px;
+padding: 9px 10px;
+font-weight: 600;
+color: #fff;
+background: #6f84d7;
+cursor: pointer;
+}
+button.primary { background: var(--accent); }
+button.secondary { background: #7c8ab8; }
+button.small { padding: 5px 6px; font-size: 11px; }
+button.edit-btn { background: #4f6fff; }
+button.save-btn { background: #22a96e; }
+.muted { color: var(--muted); font-size: 13px; }
+.pair-grid {
+display: grid;
+grid-template-columns: 1fr auto 1fr;
+gap: 10px;
+align-items: center;
+margin-top: 8px;
+}
+.pair { background: #eef3ff; border-radius: 10px; padding: 10px; min-height: 110px; }
+.tag {
+display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; margin: 3px 3px 0 0;
+background: #e5ecff; color: #3b4e84;
+}
+.tag.good { background: #dcf4e7; color: #246547; }
+.tag.warn { background: #fff0d8; color: #8d5f1f; }
+.history-item {
+border-left: 3px solid #4f6fff;
+padding: 10px 12px;
+background: #eef3ff;
+border-radius: 10px;
+margin-top: 8px;
+}
+.history-main { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.history-matchup { font-weight: 600; font-size: 14px; flex: 1; min-width: 0; }
+.history-score-display {
+font-size: 20px; font-weight: 800; letter-spacing: 1px;
+padding: 2px 10px; border-radius: 8px;
+background: #fff; border: 1px solid #c8d5fb;
+color: var(--text);
+}
+.history-score-display .winner { color: #22a96e; }
+.history-score-display .loser { color: #b0b8d4; }
+.score-entry {
+display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap;
+}
+.score-entry input[type=number] {
+width: 52px; padding: 5px 6px; border-radius: 8px;
+border: 1px solid #c2d0ff; background: #fff;
+font-size: 15px; font-weight: 700; text-align: center; color: var(--text);
+}
+.score-entry .sep { font-weight: 700; color: var(--muted); }
+.score-entry .pair-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+.score-save-btn { background: #22a96e; padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+.score-edit-btn { background: #7c8ab8; padding: 4px 8px; font-size: 11px; border-radius: 7px; }
+.win-badge { background: #dcf4e7; color: #246547; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.lose-badge { background: #f5f5f5; color: #8a94b0; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+
+/* Leaderboard */
+.lb-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
+.lb-table th {
+color: #6a769f; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase;
+padding: 4px 10px; text-align: left; font-weight: 600;
+}
+.lb-table th.right, .lb-table td.right { text-align: center; }
+.lb-table td { padding: 10px; font-size: 14px; background: var(--card); border: 1px solid #e1e9ff; }
+.lb-table td:first-child { border-radius: 12px 0 0 12px; }
+.lb-table td:last-child { border-radius: 0 12px 12px 0; border-right: 1px solid #e1e9ff; }
+.lb-rank { font-weight: 700; color: var(--muted); width: 28px; }
+.lb-rank.top1 { color: #f5a623; font-size: 16px; }
+.lb-rank.top2 { color: #8fa8c8; font-size: 15px; }
+.lb-rank.top3 { color: #c47a3e; font-size: 15px; }
+.lb-name { font-weight: 700; }
+.lb-wins { font-weight: 800; color: #22a96e; font-size: 15px; }
+.lb-gp { color: var(--muted); font-weight: 600; }
+.lb-skill { color: #4f6fff; font-weight: 700; }
+.lb-points { font-weight: 800; color: #f5a623; font-size: 15px; }
+@media (max-width: 760px) {
+body {
+padding: 0;
+display: block;
+}
+.device {
+width: 100%;
+min-width: 0;
+min-height: 100vh;
+border-radius: 0;
+border: 0;
+padding: 0;
+box-shadow: none;
+resize: none;
+}
+.screen {
+min-height: 100vh;
+border-radius: 0;
+border: 0;
+}
+.view { padding: 10px; }
+.card { padding: 10px; border-radius: 12px; }
+.table-inner { width: max-content; min-width: 100%; }
+.header-row, .row {
+font-size: 12px;
+grid-template-columns: 24px minmax(86px, 1.65fr) 40px 30px 54px 42px 66px;
+gap: 2px;
+}
+button.small { padding: 4px 5px; font-size: 10px; }
+.pair-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
-  <div class="device">
-    <div class="screen">
-      <div class="top">
-        <h1 class="title">ShuttleMix</h1>
-        <div class="subtitle">Badminton matchmaking randomizer</div>
-      </div>
-      <div class="tabs">
-        <button class="tab active" data-view="playersView">Players</button>
-        <button class="tab" data-view="matchView">Match</button>
-        <button class="tab" data-view="historyView">History</button>
-      </div>
+<div class="device">
+<div class="screen">
+<div class="top">
+<h1 class="title">ShuttleMix</h1>
+<div class="subtitle">Badminton matchmaking randomizer</div>
+</div>
+<div class="tabs">
+<button class="tab active" data-view="playersView">Players</button>
+<button class="tab" data-view="matchView">Match</button>
+<button class="tab" data-view="historyView">History</button>
+<button class="tab" data-view="leaderboardView">Leaderboard</button>
+</div>
+<section id="playersView" class="view active">
+<div class="card">
+<div class="toolbar" id="toolbar">
+<input id="nameInput" class="name-input" placeholder="Player name" />
+<input id="skillInput" class="skill-input" type="number" min="1" max="10" step="0.1" placeholder="Skill" />
+<button id="addPlayerBtn" class="primary">Add Player</button>
+<button id="resetBtn" class="secondary">Reset Sample Data</button>
+<span class="edit-mode-hint">✏️ Editing — update fields above &amp; press Save</span>
+</div>
+</div>
+<div class="card">
+<div class="table-scroll">
+<div class="table-inner">
+<div class="header-row"><div>#</div><div>Name</div><div class="col-skill">Skill</div><div class="col-games">GP</div><div class="col-priority">Priority</div><div class="col-skip">Skip</div><div class="col-actions">Act</div></div>
+<div id="playersTable"></div>
+</div>
+</div>
+</div>
+</section>
+<section id="matchView" class="view">
+<div class="card">
+<div class="toolbar">
+<button id="generateBtn" class="primary">Generate Next Match</button>
+<button id="confirmBtn">Confirm Match Start</button>
+<button id="rerollBtn">Reroll</button>
+</div>
+<div class="muted" style="margin-top:8px;">Logic priority: fairness gap, skill similarity, pair average balance, avoid exact repeat pairings.</div>
+<div id="matchResult" style="margin-top:10px;"></div>
+</div>
+</section>
+<section id="historyView" class="view">
+<div class="card">
+<div id="stats" class="muted">No matches yet.</div>
+<div id="historyList"></div>
+</div>
+</section>
+<section id="leaderboardView" class="view">
+<div class="card">
+<div id="leaderboardTable"></div>
+</div>
+<div class="card" style="margin-top:0;">
+<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#6a769f;margin-bottom:10px;">How rankings work</div>
+<div style="display:flex;flex-direction:column;gap:7px;">
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#fff4e0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#f5a623;flex-shrink:0;">1</span>
+<div><span style="font-weight:700;color:#1b2340;">Points</span> <span style="color:#5f6d94;font-size:13px;">— Your pair's score in each match is added to your total. Win 21–15 and you earn 21 pts; your opponents earn 15 pts each. More points = higher rank.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#e6f8ee;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#22a96e;flex-shrink:0;">2</span>
+<div><span style="font-weight:700;color:#1b2340;">Wins</span> <span style="color:#5f6d94;font-size:13px;">— If two players have equal points, the one with more match wins ranks higher.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
+<div><span style="font-weight:700;color:#1b2340;">Fewest Games Played</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player who achieved the same result in fewer games ranks higher. Efficiency matters.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#8a94b0;flex-shrink:0;">4</span>
+<div><span style="font-weight:700;color:#1b2340;">Lower Skill</span> <span style="color:#5f6d94;font-size:13px;">— Last tiebreaker. A lower-rated player who matches a higher-rated player's record is ranked above them — a nod to the underdog.</span></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<script>
+const defaultPlayers = [
+{ id: crypto.randomUUID(), name: "Joshua", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Julius", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Michael", skill: 7.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Nopi", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Open", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Michelle", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Sendy", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false }
+];
 
-      <section id="playersView" class="view active">
-        <div class="card">
-          <div class="toolbar">
-            <input id="nameInput" class="name-input" placeholder="Player name" />
-            <input id="skillInput" class="skill-input" type="number" min="1" max="10" step="0.1" placeholder="Skill" />
-            <button id="addPlayerBtn" class="primary">Add Player</button>
-            <button id="resetBtn" class="secondary">Reset Sample Data</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="table-scroll">
-            <div class="table-inner">
-              <div class="header-row"><div>#</div><div>Name</div><div class="col-skill">Skill</div><div class="col-games">GP</div><div class="col-priority">Priority</div><div class="col-skip">Skip</div><div class="col-actions">Act</div></div>
-              <div id="playersTable"></div>
-            </div>
-          </div>
-        </div>
-      </section>
+let players = JSON.parse(localStorage.getItem("shuttlemix_players") || "null") || defaultPlayers;
+// Migrate: ensure wins field exists
+players.forEach(p => { if (p.wins === undefined) p.wins = 0; if (p.points === undefined) p.points = 0; });
+let history = JSON.parse(localStorage.getItem("shuttlemix_history") || "[]");
+let currentMatch = null;
+let editingId = null; // track which player is being edited
 
-      <section id="matchView" class="view">
-        <div class="card">
-          <div class="toolbar">
-            <button id="generateBtn" class="primary">Generate Next Match</button>
-            <button id="confirmBtn">Confirm Match Start</button>
-            <button id="rerollBtn">Reroll</button>
-          </div>
-          <div class="muted" style="margin-top:8px;">Logic priority: fairness gap, skill similarity, pair average balance, avoid exact repeat pairings.</div>
-          <div id="matchResult" style="margin-top:10px;"></div>
-        </div>
-      </section>
+const seenPairings = new Set(JSON.parse(localStorage.getItem("shuttlemix_seen") || "[]"));
+const byId = (id) => players.find(p => p.id === id);
+const save = () => {
+localStorage.setItem("shuttlemix_players", JSON.stringify(players));
+localStorage.setItem("shuttlemix_history", JSON.stringify(history));
+localStorage.setItem("shuttlemix_seen", JSON.stringify(Array.from(seenPairings)));
+};
 
-      <section id="historyView" class="view">
-        <div class="card">
-          <div id="stats" class="muted">No matches yet.</div>
-          <div id="historyList"></div>
-        </div>
-      </section>
-    </div>
-  </div>
+function pairKey(idsA, idsB) {
+const a = idsA.slice().sort().join("-");
+const b = idsB.slice().sort().join("-");
+return [a, b].sort().join("|");
+}
 
-  <script>
-    const defaultPlayers = [
-      { id: crypto.randomUUID(), name: "Joshua", skill: 6.0, matches: 0, priority: false, skip: false },
-      { id: crypto.randomUUID(), name: "Julius", skill: 6.0, matches: 0, priority: false, skip: false },
-      { id: crypto.randomUUID(), name: "Michael", skill: 7.0, matches: 0, priority: false, skip: false },
-      { id: crypto.randomUUID(), name: "Nopi", skill: 4.0, matches: 0, priority: false, skip: false },
-      { id: crypto.randomUUID(), name: "Open", skill: 4.0, matches: 0, priority: false, skip: false },
-      { id: crypto.randomUUID(), name: "Michelle", skill: 4.0, matches: 0, priority: false, skip: false },
-      { id: crypto.randomUUID(), name: "Sendy", skill: 5.0, matches: 0, priority: false, skip: false }
-    ];
+function allLineups(pool) {
+const out = [];
+for (let i = 0; i < pool.length - 3; i++) {
+for (let j = i + 1; j < pool.length - 2; j++) {
+for (let k = j + 1; k < pool.length - 1; k++) {
+for (let m = k + 1; m < pool.length; m++) {
+const four = [pool[i], pool[j], pool[k], pool[m]];
+const splitA = [four[0], four[1]];
+const splitB = [four[2], four[3]];
+const splitC = [four[0], four[2]];
+const splitD = [four[1], four[3]];
+const splitE = [four[0], four[3]];
+const splitF = [four[1], four[2]];
+out.push([splitA, splitB], [splitC, splitD], [splitE, splitF]);
+}
+}
+}
+}
+return out;
+}
 
-    let players = JSON.parse(localStorage.getItem("shuttlemix_players") || "null") || defaultPlayers;
-    let history = JSON.parse(localStorage.getItem("shuttlemix_history") || "[]");
-    let currentMatch = null;
-    const seenPairings = new Set(JSON.parse(localStorage.getItem("shuttlemix_seen") || "[]"));
+function chooseMatch() {
+const active = players.filter(p => !p.skip);
+if (active.length < 4) return { error: "Need at least 4 active players (skip off)." };
+const priorities = active.filter(p => p.priority);
+const high = Math.max(...active.map(p => p.matches));
+const fairnessPool = active.filter(p => p.matches >= high - 1);
+const lowPool = active.filter(p => p.matches <= high - 2);
+// Always keep priority players in the candidate pool even if they've played more
+let candidatePool = lowPool.length > 0 ? [...new Set([...lowPool, ...fairnessPool])] : active;
+if (priorities.length) {
+candidatePool = [...new Set([...candidatePool, ...priorities])];
+}
+const lineups = allLineups(candidatePool);
+if (!lineups.length) return { error: "No valid lineup found." };
+// Try with fairness cap starting at 2, relaxing by 1 each pass until a lineup is found.
+// This keeps fairness as tight as possible while still accommodating priority players.
+let best = null;
+for (let maxGap = 2; maxGap <= active.length && !best; maxGap++) {
+for (const [a, b] of lineups) {
+const everyone = [...a, ...b];
+if (priorities.length && !priorities.some(pr => everyone.some(p => p.id === pr.id))) continue;
+const projected = players.map(p => ({ ...p }));
+for (const p of everyone) {
+projected.find(x => x.id === p.id).matches += 1;
+}
+const activeProjected = projected.filter(p => !p.skip);
+const maxGames = Math.max(...activeProjected.map(p => p.matches));
+const minGames = Math.min(...activeProjected.map(p => p.matches));
+const fairnessGap = maxGames - minGames;
+if (fairnessGap > maxGap) continue;
+const allSkills = everyone.map(p => p.skill);
+const spread = Math.max(...allSkills) - Math.min(...allSkills);
+const avgA = (a[0].skill + a[1].skill) / 2;
+const avgB = (b[0].skill + b[1].skill) / 2;
+const pairDelta = Math.abs(avgA - avgB);
+const key = pairKey(a.map(p => p.id), b.map(p => p.id));
+const repeated = seenPairings.has(key) ? 1 : 0;
+const priorityBoost = priorities.length ? (everyone.some(p => p.priority) ? 0 : 100) : 0;
+const score = fairnessGap * 1000 + priorityBoost + spread * 30 + pairDelta * 20 + repeated * 200;
+if (!best || score < best.score) {
+best = { a, b, avgA, avgB, spread, pairDelta, fairnessGap, repeated, key, score };
+}
+}
+}
+if (!best) return { error: "No valid lineup found. Add more players or adjust skip toggles." };
+return best;
+}
 
-    const byId = (id) => players.find(p => p.id === id);
-    const save = () => {
-      localStorage.setItem("shuttlemix_players", JSON.stringify(players));
-      localStorage.setItem("shuttlemix_history", JSON.stringify(history));
-      localStorage.setItem("shuttlemix_seen", JSON.stringify(Array.from(seenPairings)));
-    };
+function setEditMode(id) {
+editingId = id;
+const toolbar = document.getElementById("toolbar");
+const nameInput = document.getElementById("nameInput");
+const skillInput = document.getElementById("skillInput");
+const addBtn = document.getElementById("addPlayerBtn");
 
-    function pairKey(idsA, idsB) {
-      const a = idsA.slice().sort().join("-");
-      const b = idsB.slice().sort().join("-");
-      return [a, b].sort().join("|");
-    }
+if (id) {
+const p = byId(id);
+nameInput.value = p.name;
+skillInput.value = p.skill;
+nameInput.focus();
+toolbar.classList.add("editing-mode");
+addBtn.textContent = "Save Changes";
+addBtn.classList.remove("primary");
+addBtn.classList.add("save-btn");
+} else {
+nameInput.value = "";
+skillInput.value = "";
+toolbar.classList.remove("editing-mode");
+addBtn.textContent = "Add Player";
+addBtn.classList.add("primary");
+addBtn.classList.remove("save-btn");
+}
+renderPlayers();
+}
 
-    function allLineups(pool) {
-      const out = [];
-      for (let i = 0; i < pool.length - 3; i++) {
-        for (let j = i + 1; j < pool.length - 2; j++) {
-          for (let k = j + 1; k < pool.length - 1; k++) {
-            for (let m = k + 1; m < pool.length; m++) {
-              const four = [pool[i], pool[j], pool[k], pool[m]];
-              const splitA = [four[0], four[1]];
-              const splitB = [four[2], four[3]];
-              const splitC = [four[0], four[2]];
-              const splitD = [four[1], four[3]];
-              const splitE = [four[0], four[3]];
-              const splitF = [four[1], four[2]];
-              out.push([splitA, splitB], [splitC, splitD], [splitE, splitF]);
-            }
-          }
-        }
-      }
-      return out;
-    }
+function renderPlayers() {
+const table = document.getElementById("playersTable");
+table.innerHTML = "";
+players.forEach((p, idx) => {
+const isEditing = editingId === p.id;
+const row = document.createElement("div");
+let rowClass = "row";
+if (isEditing) rowClass += " editing";
+else if (p.skip) rowClass += " skip";
+else if (p.priority) rowClass += " priority";
+row.className = rowClass;
 
-    function chooseMatch() {
-      const active = players.filter(p => !p.skip);
-      if (active.length < 4) return { error: "Need at least 4 active players (skip off)." };
+const actionsHTML = isEditing
+  ? `<button class="small save-btn" data-role="save" data-id="${p.id}" title="Save changes">Save</button><button class="small danger" data-role="delete" data-id="${p.id}" title="Delete player">Del</button>`
+  : `<button class="small edit-btn" data-role="edit" data-id="${p.id}" title="Edit player">Edit</button>`;
 
-      const priorities = active.filter(p => p.priority);
-      const high = Math.max(...active.map(p => p.matches));
-      const fairnessPool = active.filter(p => p.matches >= high - 1);
-      const lowPool = active.filter(p => p.matches <= high - 2);
-      const candidatePool = lowPool.length > 0 ? [...new Set([...lowPool, ...fairnessPool])] : active;
+row.innerHTML = `
+<div>${idx + 1}</div>
+<div class="name">${p.name}</div>
+<div class="skill col-skill">${p.skill.toFixed(1)}</div>
+<div class="col-games">${p.matches}</div>
+<div class="toggle-wrap"><input type="checkbox" ${p.priority ? "checked" : ""} data-role="priority" data-id="${p.id}" ${p.skip ? "disabled" : ""}></div>
+<div class="toggle-wrap"><input type="checkbox" ${p.skip ? "checked" : ""} data-role="skip" data-id="${p.id}"></div>
+<div class="col-actions">${actionsHTML}</div>
+`;
+table.appendChild(row);
+});
+bindRowHandlers();
+save();
+}
 
-      const lineups = allLineups(candidatePool);
-      if (!lineups.length) return { error: "No valid lineup found." };
+function bindRowHandlers() {
+document.querySelectorAll('[data-role="priority"]').forEach(el => {
+el.onchange = (e) => {
+const p = byId(e.target.dataset.id);
+if (!p) return;
+p.priority = e.target.checked;
+if (p.priority) p.skip = false;
+renderPlayers();
+};
+});
 
-      let best = null;
-      for (const [a, b] of lineups) {
-        const everyone = [...a, ...b];
-        if (priorities.length && !priorities.some(pr => everyone.some(p => p.id === pr.id))) continue;
+document.querySelectorAll('[data-role="skip"]').forEach(el => {
+el.onchange = (e) => {
+const p = byId(e.target.dataset.id);
+if (!p) return;
+p.skip = e.target.checked;
+if (p.skip) p.priority = false;
+renderPlayers();
+};
+});
 
-        const projected = players.map(p => ({ ...p }));
-        for (const p of everyone) {
-          projected.find(x => x.id === p.id).matches += 1;
-        }
-        const activeProjected = projected.filter(p => !p.skip);
-        const maxGames = Math.max(...activeProjected.map(p => p.matches));
-        const minGames = Math.min(...activeProjected.map(p => p.matches));
-        const fairnessGap = maxGames - minGames;
-        if (fairnessGap > 2) continue;
+document.querySelectorAll('[data-role="edit"]').forEach(el => {
+el.onclick = (e) => {
+setEditMode(e.target.dataset.id);
+};
+});
 
-        const allSkills = everyone.map(p => p.skill);
-        const spread = Math.max(...allSkills) - Math.min(...allSkills);
-        const avgA = (a[0].skill + a[1].skill) / 2;
-        const avgB = (b[0].skill + b[1].skill) / 2;
-        const pairDelta = Math.abs(avgA - avgB);
-        const key = pairKey(a.map(p => p.id), b.map(p => p.id));
-        const repeated = seenPairings.has(key) ? 1 : 0;
+document.querySelectorAll('[data-role="save"]').forEach(el => {
+el.onclick = (e) => {
+// Save from row button = same as save from toolbar
+saveEditedPlayer();
+};
+});
 
-        const priorityBoost = priorities.length ? (everyone.some(p => p.priority) ? 0 : 100) : 0;
-        const score = fairnessGap * 1000 + priorityBoost + spread * 30 + pairDelta * 20 + repeated * 200;
+document.querySelectorAll('[data-role="delete"]').forEach(el => {
+el.onclick = (e) => {
+players = players.filter(p => p.id !== e.target.dataset.id);
+if (editingId === e.target.dataset.id) setEditMode(null);
+else renderPlayers();
+renderStats();
+};
+});
+}
 
-        if (!best || score < best.score) {
-          best = { a, b, avgA, avgB, spread, pairDelta, fairnessGap, repeated, key, score };
-        }
-      }
-      if (!best) return { error: "No lineup satisfies fairness <= 2. Add players or adjust skip toggles." };
-      return best;
-    }
+function saveEditedPlayer() {
+if (!editingId) return;
+const nameInput = document.getElementById("nameInput");
+const skillInput = document.getElementById("skillInput");
+const name = nameInput.value.trim();
+const skill = Number(skillInput.value);
+if (!name) return alert("Enter player name.");
+if (Number.isNaN(skill) || skill < 1 || skill > 10) return alert("Skill must be 1.0 to 10.0");
+const p = byId(editingId);
+if (p) {
+p.name = name;
+p.skill = skill;
+}
+setEditMode(null);
+renderStats();
+}
 
-    function renderPlayers() {
-      const table = document.getElementById("playersTable");
-      table.innerHTML = "";
-      players.forEach((p, idx) => {
-        const row = document.createElement("div");
-        row.className = `row${p.skip ? " skip" : p.priority ? " priority" : ""}`;
-        row.innerHTML = `
-          <div>${idx + 1}</div>
-          <div class="name">${p.name}</div>
-          <div class="skill col-skill">${p.skill.toFixed(1)}</div>
-          <div class="col-games">${p.matches}</div>
-          <div class="toggle-wrap"><input type="checkbox" ${p.priority ? "checked" : ""} data-role="priority" data-id="${p.id}" ${p.skip ? "disabled" : ""}></div>
-          <div class="toggle-wrap"><input type="checkbox" ${p.skip ? "checked" : ""} data-role="skip" data-id="${p.id}"></div>
-          <div class="col-actions"><button class="small danger" data-role="delete" data-id="${p.id}">Del</button></div>
-        `;
-        table.appendChild(row);
-      });
-      bindRowHandlers();
-      save();
-    }
+function renderMatch() {
+const box = document.getElementById("matchResult");
+if (!currentMatch) {
+box.innerHTML = '<div class="muted">No match generated yet.</div>';
+return;
+}
+box.innerHTML = `
+<div class="pair-grid">
+<div class="pair"><strong>Pair A</strong><br>${currentMatch.a[0].name} (${currentMatch.a[0].skill.toFixed(1)})<br>${currentMatch.a[1].name} (${currentMatch.a[1].skill.toFixed(1)})<br><span class="muted">Avg ${currentMatch.avgA.toFixed(2)}</span></div>
+<div><strong>VS</strong></div>
+<div class="pair"><strong>Pair B</strong><br>${currentMatch.b[0].name} (${currentMatch.b[0].skill.toFixed(1)})<br>${currentMatch.b[1].name} (${currentMatch.b[1].skill.toFixed(1)})<br><span class="muted">Avg ${currentMatch.avgB.toFixed(2)}</span></div>
+</div>
+<div style="margin-top:8px;">
+<span class="tag good">Games fairness gap: ${currentMatch.fairnessGap}</span>
+<span class="tag ${currentMatch.spread <= 2.5 ? "good" : "warn"}">Skill spread: ${currentMatch.spread.toFixed(2)}</span>
+<span class="tag ${currentMatch.pairDelta <= 0.8 ? "good" : "warn"}">Pair avg delta: ${currentMatch.pairDelta.toFixed(2)}</span>
+<span class="tag ${currentMatch.repeated ? "warn" : "good"}">${currentMatch.repeated ? "Repeat pairing used" : "Repeat pairing avoided"}</span>
+</div>
+`;
+}
 
-    function bindRowHandlers() {
-      document.querySelectorAll('[data-role="priority"]').forEach(el => {
-        el.onchange = (e) => {
-          const p = byId(e.target.dataset.id);
-          if (!p) return;
-          p.priority = e.target.checked;
-          if (p.priority) p.skip = false;
-          renderPlayers();
-        };
-      });
-      document.querySelectorAll('[data-role="skip"]').forEach(el => {
-        el.onchange = (e) => {
-          const p = byId(e.target.dataset.id);
-          if (!p) return;
-          p.skip = e.target.checked;
-          if (p.skip) p.priority = false;
-          renderPlayers();
-        };
-      });
-      document.querySelectorAll('[data-role="delete"]').forEach(el => {
-        el.onclick = (e) => {
-          players = players.filter(p => p.id !== e.target.dataset.id);
-          renderPlayers();
-          renderStats();
-        };
-      });
-    }
+function renderStats() {
+const stats = document.getElementById("stats");
+if (!players.length) {
+stats.textContent = "No players.";
+return;
+}
+const most = [...players].sort((a,b) => b.matches - a.matches)[0];
+const least = [...players].sort((a,b) => a.matches - b.matches)[0];
+const avgDelta = history.length
+? (history.reduce((acc, h) => acc + h.pairDelta, 0) / history.length).toFixed(2)
+: "n/a";
+stats.innerHTML = `Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong>`;
+}
 
-    function renderMatch() {
-      const box = document.getElementById("matchResult");
-      if (!currentMatch) {
-        box.innerHTML = '<div class="muted">No match generated yet.</div>';
-        return;
-      }
-      box.innerHTML = `
-        <div class="pair-grid">
-          <div class="pair"><strong>Pair A</strong><br>${currentMatch.a[0].name} (${currentMatch.a[0].skill.toFixed(1)})<br>${currentMatch.a[1].name} (${currentMatch.a[1].skill.toFixed(1)})<br><span class="muted">Avg ${currentMatch.avgA.toFixed(2)}</span></div>
-          <div><strong>VS</strong></div>
-          <div class="pair"><strong>Pair B</strong><br>${currentMatch.b[0].name} (${currentMatch.b[0].skill.toFixed(1)})<br>${currentMatch.b[1].name} (${currentMatch.b[1].skill.toFixed(1)})<br><span class="muted">Avg ${currentMatch.avgB.toFixed(2)}</span></div>
-        </div>
-        <div style="margin-top:8px;">
-          <span class="tag good">Games fairness gap: ${currentMatch.fairnessGap}</span>
-          <span class="tag ${currentMatch.spread <= 2.5 ? "good" : "warn"}">Skill spread: ${currentMatch.spread.toFixed(2)}</span>
-          <span class="tag ${currentMatch.pairDelta <= 0.8 ? "good" : "warn"}">Pair avg delta: ${currentMatch.pairDelta.toFixed(2)}</span>
-          <span class="tag ${currentMatch.repeated ? "warn" : "good"}">${currentMatch.repeated ? "Repeat pairing used" : "Repeat pairing avoided"}</span>
-        </div>
-      `;
-    }
+function saveScore(histId, scoreA, scoreB) {
+const h = history.find(x => x.id === histId);
+if (!h) return;
+const a = parseInt(scoreA), b = parseInt(scoreB);
+if (isNaN(a) || isNaN(b) || a < 0 || b < 0) return alert("Enter valid scores (0 or more).");
+if (a === b) return alert("Scores can't be a draw — enter different values.");
+// Undo previous credits if re-scoring
+if (h.scoreA !== null) {
+const prevWinIds = h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds;
+prevWinIds.forEach(id => { const p = byId(id); if (p) p.wins = Math.max(0, p.wins - 1); });
+h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreA); });
+h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreB); });
+}
+h.scoreA = a;
+h.scoreB = b;
+// Credit wins to winner pair
+const winIds = a > b ? h.pairAIds : h.pairBIds;
+winIds.forEach(id => { const p = byId(id); if (p) p.wins += 1; });
+// Credit points to all players based on their pair's score
+h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points += a; });
+h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points += b; });
+save();
+renderHistory();
+renderLeaderboard();
+renderPlayers();
+}
 
-    function renderStats() {
-      const stats = document.getElementById("stats");
-      if (!players.length) {
-        stats.textContent = "No players.";
-        return;
-      }
-      const most = [...players].sort((a,b) => b.matches - a.matches)[0];
-      const least = [...players].sort((a,b) => a.matches - b.matches)[0];
-      const avgDelta = history.length
-        ? (history.reduce((acc, h) => acc + h.pairDelta, 0) / history.length).toFixed(2)
-        : "n/a";
-      stats.innerHTML = `Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong>`;
-    }
+function renderHistory() {
+const list = document.getElementById("historyList");
+list.innerHTML = "";
+[...history].reverse().forEach(h => {
+const hasScore = h.scoreA !== null;
+const aWon = hasScore && h.scoreA > h.scoreB;
+const item = document.createElement("div");
+item.className = "history-item";
 
-    function renderHistory() {
-      const list = document.getElementById("historyList");
-      list.innerHTML = "";
-      [...history].reverse().forEach(h => {
-        const item = document.createElement("div");
-        item.className = "history-item";
-        item.innerHTML = `${h.time} - ${h.pairA.join("/")} vs ${h.pairB.join("/")} <span class="tag ${h.repeated ? "warn" : "good"}">${h.repeated ? "Repeated pairing" : "Unique pairing"}</span>`;
-        list.appendChild(item);
-      });
-      renderStats();
-    }
+const scoreDisplay = hasScore
+? `<span class="history-score-display">
+<span class="${aWon ? "winner" : "loser"}">${h.scoreA}</span>
+<span style="color:#b0b8d4;font-weight:400;font-size:14px"> – </span>
+<span class="${!aWon ? "winner" : "loser"}">${h.scoreB}</span>
+</span>`
+: "";
 
-    document.getElementById("addPlayerBtn").onclick = () => {
-      const nameInput = document.getElementById("nameInput");
-      const skillInput = document.getElementById("skillInput");
-      const name = nameInput.value.trim();
-      const skill = Number(skillInput.value);
-      if (!name) return alert("Enter player name.");
-      if (Number.isNaN(skill) || skill < 1 || skill > 10) return alert("Skill must be 1.0 to 10.0");
-      players.push({ id: crypto.randomUUID(), name, skill, matches: 0, priority: false, skip: false });
-      nameInput.value = "";
-      skillInput.value = "";
-      renderPlayers();
-      renderStats();
-    };
+const winBadges = hasScore
+? `<span class="win-badge">${aWon ? h.pairA.join("/") : h.pairB.join("/")} won</span>`
+: "";
 
-    document.getElementById("resetBtn").onclick = () => {
-      players = JSON.parse(JSON.stringify(defaultPlayers));
-      history = [];
-      currentMatch = null;
-      seenPairings.clear();
-      renderPlayers();
-      renderMatch();
-      renderHistory();
-    };
+item.innerHTML = `
+<div class="history-main">
+<div class="history-matchup">
+<span style="color:#4f6fff">${h.pairA.join(" / ")}</span>
+<span style="color:#b0b8d4;margin:0 5px">vs</span>
+<span style="color:#5f6d94">${h.pairB.join(" / ")}</span>
+</div>
+${scoreDisplay}
+<span class="tag ${h.repeated ? "warn" : "good"}" style="white-space:nowrap">${h.repeated ? "Repeat" : "Unique"}</span>
+${winBadges}
+<span style="color:#b0b8d4;font-size:12px;white-space:nowrap">${h.time}</span>
+${hasScore ? `<button class="score-edit-btn" data-hid="${h.id}">Edit score</button>` : ""}
+</div>
+<div class="score-entry" id="se-${h.id}" style="${hasScore ? "display:none" : ""}">
+<span class="pair-label">${h.pairA.join("/")}</span>
+<input type="number" min="0" id="sa-${h.id}" value="${h.scoreA ?? ""}" placeholder="0" />
+<span class="sep">–</span>
+<input type="number" min="0" id="sb-${h.id}" value="${h.scoreB ?? ""}" placeholder="0" />
+<span class="pair-label">${h.pairB.join("/")}</span>
+<button class="score-save-btn" data-hid="${h.id}">Save score</button>
+</div>
+`;
+list.appendChild(item);
+});
 
-    document.getElementById("generateBtn").onclick = () => {
-      const pick = chooseMatch();
-      if (pick.error) return alert(pick.error);
-      currentMatch = pick;
-      renderMatch();
-      document.querySelector('[data-view="matchView"]').click();
-    };
+// Bind score save buttons
+document.querySelectorAll(".score-save-btn").forEach(btn => {
+btn.onclick = () => {
+const hid = btn.dataset.hid;
+saveScore(hid, document.getElementById(`sa-${hid}`).value, document.getElementById(`sb-${hid}`).value);
+};
+});
+// Bind edit score buttons
+document.querySelectorAll(".score-edit-btn").forEach(btn => {
+btn.onclick = () => {
+const hid = btn.dataset.hid;
+const row = document.getElementById(`se-${hid}`);
+if (row) row.style.display = "flex";
+};
+});
 
-    document.getElementById("rerollBtn").onclick = () => {
-      if (currentMatch) seenPairings.add(currentMatch.key);
-      const pick = chooseMatch();
-      if (pick.error) return alert(pick.error);
-      currentMatch = pick;
-      renderMatch();
-      save();
-    };
+renderStats();
+}
 
-    document.getElementById("confirmBtn").onclick = () => {
-      if (!currentMatch) return alert("Generate a match first.");
-      const everyone = [...currentMatch.a, ...currentMatch.b];
-      everyone.forEach(p => {
-        const player = byId(p.id);
-        if (player) player.matches += 1;
-      });
-      seenPairings.add(currentMatch.key);
-      history.push({
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        pairA: currentMatch.a.map(p => p.name),
-        pairB: currentMatch.b.map(p => p.name),
-        pairDelta: currentMatch.pairDelta,
-        repeated: Boolean(currentMatch.repeated)
-      });
-      currentMatch = null;
-      renderPlayers();
-      renderMatch();
-      renderHistory();
-    };
+function renderLeaderboard() {
+const box = document.getElementById("leaderboardTable");
+if (!players.length) { box.innerHTML = '<div class="muted">No players yet.</div>'; return; }
+const ranked = [...players].sort((a, b) => {
+if (b.points !== a.points) return b.points - a.points;
+if (b.wins !== a.wins) return b.wins - a.wins;
+if (a.matches !== b.matches) return a.matches - b.matches;
+return a.skill - b.skill;
+});
+const medals = ["🥇", "🥈", "🥉"];
+const rankClasses = ["top1", "top2", "top3"];
+let rows = ranked.map((p, i) => {
+const rankDisplay = i < 3 ? medals[i] : (i + 1);
+const rankClass = i < 3 ? rankClasses[i] : "";
+return `<tr>
+<td class="lb-rank ${rankClass}">${rankDisplay}</td>
+<td class="lb-name">${p.name}</td>
+<td class="lb-skill right">${p.skill.toFixed(1)}</td>
+<td class="lb-gp right">${p.matches}</td>
+<td class="lb-wins right">${p.wins}</td>
+<td class="lb-points right">${p.points}</td>
+</tr>`;
+}).join("");
+box.innerHTML = `<table class="lb-table">
+<thead><tr>
+<th class="lb-rank">#</th>
+<th>Name</th>
+<th class="right">Skill</th>
+<th class="right">GP</th>
+<th class="right">Won</th>
+<th class="right">Points</th>
+</tr></thead>
+<tbody>${rows}</tbody>
+</table>`;
+}
 
-    document.querySelectorAll(".tab").forEach(tab => {
-      tab.onclick = () => {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-        tab.classList.add("active");
-        document.getElementById(tab.dataset.view).classList.add("active");
-      };
-    });
+document.getElementById("addPlayerBtn").onclick = () => {
+if (editingId) {
+// In edit mode: Save Changes
+saveEditedPlayer();
+return;
+}
+const nameInput = document.getElementById("nameInput");
+const skillInput = document.getElementById("skillInput");
+const name = nameInput.value.trim();
+const skill = Number(skillInput.value);
+if (!name) return alert("Enter player name.");
+if (Number.isNaN(skill) || skill < 1 || skill > 10) return alert("Skill must be 1.0 to 10.0");
+players.push({ id: crypto.randomUUID(), name, skill, matches: 0, wins: 0, points: 0, priority: false, skip: false });
+nameInput.value = "";
+skillInput.value = "";
+renderPlayers();
+renderStats();
+};
 
-    renderPlayers();
-    renderMatch();
-    renderHistory();
-  </script>
+document.getElementById("resetBtn").onclick = () => {
+players = JSON.parse(JSON.stringify(defaultPlayers));
+history = [];
+currentMatch = null;
+editingId = null;
+seenPairings.clear();
+// Reset toolbar state too
+const toolbar = document.getElementById("toolbar");
+const addBtn = document.getElementById("addPlayerBtn");
+toolbar.classList.remove("editing-mode");
+addBtn.textContent = "Add Player";
+addBtn.classList.add("primary");
+addBtn.classList.remove("save-btn");
+renderPlayers();
+renderMatch();
+renderHistory();
+renderLeaderboard();
+};
+
+document.getElementById("generateBtn").onclick = () => {
+const pick = chooseMatch();
+if (pick.error) return alert(pick.error);
+currentMatch = pick;
+renderMatch();
+document.querySelector('[data-view="matchView"]').click();
+};
+
+document.getElementById("rerollBtn").onclick = () => {
+if (currentMatch) seenPairings.add(currentMatch.key);
+const pick = chooseMatch();
+if (pick.error) return alert(pick.error);
+currentMatch = pick;
+renderMatch();
+save();
+};
+
+document.getElementById("confirmBtn").onclick = () => {
+if (!currentMatch) return alert("Generate a match first.");
+const everyone = [...currentMatch.a, ...currentMatch.b];
+everyone.forEach(p => {
+const player = byId(p.id);
+if (player) player.matches += 1;
+});
+seenPairings.add(currentMatch.key);
+history.push({
+id: crypto.randomUUID(),
+time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+pairA: currentMatch.a.map(p => p.name),
+pairB: currentMatch.b.map(p => p.name),
+pairAIds: currentMatch.a.map(p => p.id),
+pairBIds: currentMatch.b.map(p => p.id),
+pairDelta: currentMatch.pairDelta,
+repeated: Boolean(currentMatch.repeated),
+scoreA: null,
+scoreB: null
+});
+currentMatch = null;
+renderPlayers();
+renderMatch();
+renderHistory();
+renderLeaderboard();
+};
+
+document.querySelectorAll(".tab").forEach(tab => {
+tab.onclick = () => {
+document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+tab.classList.add("active");
+document.getElementById(tab.dataset.view).classList.add("active");
+};
+});
+
+renderPlayers();
+renderMatch();
+renderHistory();
+renderLeaderboard();
+</script>
 </body>
 </html>
