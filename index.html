@@ -233,6 +233,7 @@ font-size: 15px; font-weight: 700; text-align: center; color: var(--text);
 .score-entry .pair-label { font-size: 12px; color: var(--muted); font-weight: 600; }
 .score-save-btn { background: #22a96e; padding: 5px 10px; font-size: 12px; border-radius: 8px; }
 .score-edit-btn { background: #7c8ab8; padding: 4px 8px; font-size: 11px; border-radius: 7px; }
+.hist-del-btn { background: #d9585f; padding: 5px 9px; font-size: 12px; border-radius: 8px; margin-left: 2px; }
 .win-badge { background: #dcf4e7; color: #246547; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
 .lose-badge { background: #f5f5f5; color: #8a94b0; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
 
@@ -341,6 +342,10 @@ button.small { padding: 4px 5px; font-size: 10px; }
 <div class="card">
 <div id="leaderboardTable"></div>
 </div>
+<div class="card" id="funFactsCard" style="margin-top:0;display:none;">
+<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#6a769f;margin-bottom:10px;">✨ Did You Know?</div>
+<div id="funFactsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+</div>
 <div class="card" style="margin-top:0;">
 <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#6a769f;margin-bottom:10px;">How rankings work</div>
 <div style="display:flex;flex-direction:column;gap:7px;">
@@ -355,10 +360,6 @@ button.small { padding: 4px 5px; font-size: 10px; }
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
 <div><span style="font-weight:700;color:#1b2340;">Fewest Games Played</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player who achieved the same result in fewer games ranks higher. Efficiency matters.</span></div>
-</div>
-<div style="display:flex;align-items:flex-start;gap:10px;">
-<span style="min-width:26px;height:26px;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#8a94b0;flex-shrink:0;">4</span>
-<div><span style="font-weight:700;color:#1b2340;">Lower Skill</span> <span style="color:#5f6d94;font-size:13px;">— Last tiebreaker. A lower-rated player who matches a higher-rated player's record is ranked above them — a nod to the underdog.</span></div>
 </div>
 </div>
 </div>
@@ -620,6 +621,30 @@ const avgDelta = history.length
 stats.innerHTML = `Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong>`;
 }
 
+function deleteMatch(histId) {
+const idx = history.findIndex(x => x.id === histId);
+if (idx === -1) return;
+const h = history[idx];
+// Undo GP for all 4 players
+[...h.pairAIds, ...h.pairBIds].forEach(id => {
+const p = byId(id);
+if (p) p.matches = Math.max(0, p.matches - 1);
+});
+// Undo score credits if scored
+if (h.scoreA !== null) {
+const prevWinIds = h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds;
+prevWinIds.forEach(id => { const p = byId(id); if (p) p.wins = Math.max(0, p.wins - 1); });
+h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreA); });
+h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreB); });
+}
+history.splice(idx, 1);
+save();
+renderHistory();
+renderLeaderboard();
+renderPlayers();
+renderStats();
+}
+
 function saveScore(histId, scoreA, scoreB) {
 const h = history.find(x => x.id === histId);
 if (!h) return;
@@ -679,7 +704,7 @@ ${scoreDisplay}
 <span class="tag ${h.repeated ? "warn" : "good"}" style="white-space:nowrap">${h.repeated ? "Repeat" : "Unique"}</span>
 ${winBadges}
 <span style="color:#b0b8d4;font-size:12px;white-space:nowrap">${h.time}</span>
-${hasScore ? `<button class="score-edit-btn" data-hid="${h.id}">Edit score</button>` : ""}
+${hasScore ? `<button class="score-edit-btn" data-hid="${h.id}">Edit match</button>` : ""}
 </div>
 <div class="score-entry" id="se-${h.id}" style="${hasScore ? "display:none" : ""}">
 <span class="pair-label">${h.pairA.join("/")}</span>
@@ -688,6 +713,7 @@ ${hasScore ? `<button class="score-edit-btn" data-hid="${h.id}">Edit score</butt
 <input type="number" min="0" id="sb-${h.id}" value="${h.scoreB ?? ""}" placeholder="0" />
 <span class="pair-label">${h.pairB.join("/")}</span>
 <button class="score-save-btn" data-hid="${h.id}">Save score</button>
+<button class="hist-del-btn" data-hid="${h.id}" title="Delete this match">Del</button>
 </div>
 `;
 list.appendChild(item);
@@ -700,7 +726,7 @@ const hid = btn.dataset.hid;
 saveScore(hid, document.getElementById(`sa-${hid}`).value, document.getElementById(`sb-${hid}`).value);
 };
 });
-// Bind edit score buttons
+// Bind edit match buttons — reveal score-entry row which now also contains Del
 document.querySelectorAll(".score-edit-btn").forEach(btn => {
 btn.onclick = () => {
 const hid = btn.dataset.hid;
@@ -708,8 +734,210 @@ const row = document.getElementById(`se-${hid}`);
 if (row) row.style.display = "flex";
 };
 });
+// Bind del buttons
+document.querySelectorAll(".hist-del-btn").forEach(btn => {
+btn.onclick = () => {
+if (confirm("Delete this match? GP and scores will be adjusted.")) {
+deleteMatch(btn.dataset.hid);
+}
+};
+});
 
 renderStats();
+}
+
+function computeFunFacts() {
+const facts = [];
+const scored = history.filter(h => h.scoreA !== null);
+if (!scored.length || players.length < 2) return facts;
+
+// Helper: avg score margin for a set of matches
+const margin = (matches) => {
+const total = matches.reduce((s, h) => s + Math.abs(h.scoreA - h.scoreB), 0);
+return total / matches.length;
+};
+
+// 1. Closest matches overall player — always plays tight games
+players.forEach(p => {
+const pm = scored.filter(h => [...h.pairAIds, ...h.pairBIds].includes(p.id));
+if (pm.length >= 2) {
+const avg = margin(pm);
+if (avg <= 4) facts.push({ emoji: "🎯", text: `<strong>${p.name}</strong> lives on the edge — their matches have an average margin of just <strong>${avg.toFixed(1)} points</strong>. Every rally counts!` });
+}
+});
+
+// 2. Dominant player — high win rate (min 2 games)
+players.forEach(p => {
+if (p.matches >= 2 && p.wins / p.matches >= 0.75) {
+const pct = Math.round((p.wins / p.matches) * 100);
+facts.push({ emoji: "🔥", text: `<strong>${p.name}</strong> is on fire with a <strong>${pct}% win rate</strong> across ${p.matches} games. Unstoppable!` });
+}
+});
+
+// 3. Best duo — pair with 100% win rate (min 2 matches together)
+const pairStats = {};
+scored.forEach(h => {
+const aWon = h.scoreA > h.scoreB;
+const pairs = [
+{ ids: h.pairAIds.slice().sort(), won: aWon },
+{ ids: h.pairBIds.slice().sort(), won: !aWon }
+];
+pairs.forEach(({ ids, won }) => {
+const key = ids.join("|");
+if (!pairStats[key]) pairStats[key] = { ids, wins: 0, total: 0 };
+pairStats[key].total++;
+if (won) pairStats[key].wins++;
+});
+});
+Object.values(pairStats).forEach(ps => {
+if (ps.total >= 2 && ps.wins === ps.total) {
+const names = ps.ids.map(id => byId(id)?.name).filter(Boolean);
+if (names.length === 2) facts.push({ emoji: "🤝", text: `<strong>${names[0]}</strong> & <strong>${names[1]}</strong> are an unbeaten duo — <strong>${ps.wins} wins from ${ps.total} matches</strong> together. Chemistry unlocked!` });
+}
+});
+
+// 4. Comeback king — won a match with the largest deficit overcome (score gap tightest but still won, i.e. won despite being the lower avg team)
+// Actually: player who has won the most matches where their pair's avg score was lower
+const comebacks = {};
+scored.forEach(h => {
+const aWon = h.scoreA > h.scoreB;
+// loser had higher raw score than winner? No. Let's find matches won by smaller margin (margin 1-3 = clutch)
+const m = Math.abs(h.scoreA - h.scoreB);
+if (m <= 3) {
+const winIds = aWon ? h.pairAIds : h.pairBIds;
+winIds.forEach(id => {
+if (!comebacks[id]) comebacks[id] = 0;
+comebacks[id]++;
+});
+}
+});
+const topClutch = Object.entries(comebacks).sort((a,b) => b[1]-a[1])[0];
+if (topClutch && topClutch[1] >= 2) {
+const p = byId(topClutch[0]);
+if (p) facts.push({ emoji: "💪", text: `<strong>${p.name}</strong> thrives under pressure — they've won <strong>${topClutch[1]} nail-biting matches</strong> decided by 3 points or fewer. Clutch player!` });
+}
+
+// 8. Dynamic trio — 3 players who've all shared court together most often
+// Find player with most unique teammates
+const teammates = {};
+scored.forEach(h => {
+const allPairs = [h.pairAIds, h.pairBIds];
+allPairs.forEach(pair => {
+if (pair.length === 2) {
+const [a, b] = pair;
+if (!teammates[a]) teammates[a] = new Set();
+if (!teammates[b]) teammates[b] = new Set();
+teammates[a].add(b);
+teammates[b].add(a);
+}
+});
+});
+let socialPlayer = { name: null, count: 0 };
+Object.entries(teammates).forEach(([id, set]) => {
+if (set.size > socialPlayer.count) socialPlayer = { name: byId(id)?.name, count: set.size };
+});
+if (socialPlayer.name && socialPlayer.count >= 3) facts.push({ emoji: "🌟", text: `<strong>${socialPlayer.name}</strong> has partnered with <strong>${socialPlayer.count} different players</strong> — the ultimate team player who gels with everyone!` });
+
+// 9. Best winning margin — dominant win
+let biggestWin = { names: null, margin: 0 };
+scored.forEach(h => {
+const m = Math.abs(h.scoreA - h.scoreB);
+if (m > biggestWin.margin) {
+const winIds = h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds;
+const names = winIds.map(id => byId(id)?.name).filter(Boolean);
+biggestWin = { names, margin: m, score: `${Math.max(h.scoreA,h.scoreB)}–${Math.min(h.scoreA,h.scoreB)}` };
+}
+});
+if (biggestWin.names && biggestWin.margin >= 8) facts.push({ emoji: "💥", text: `Biggest blowout goes to <strong>${biggestWin.names.join(" & ")}</strong> — they crushed it <strong>${biggestWin.score}</strong>! Dominant!` });
+
+// 10. Winning streak — player with most consecutive wins
+const playerLastResults = {};
+history.forEach(h => {
+if (h.scoreA === null) return;
+const aWon = h.scoreA > h.scoreB;
+[...h.pairAIds, ...h.pairBIds].forEach(id => {
+if (!playerLastResults[id]) playerLastResults[id] = [];
+const won = h.pairAIds.includes(id) ? aWon : !aWon;
+playerLastResults[id].push(won);
+});
+});
+let bestStreak = { name: null, streak: 0 };
+Object.entries(playerLastResults).forEach(([id, results]) => {
+let streak = 0, max = 0;
+results.forEach(w => { streak = w ? streak + 1 : 0; max = Math.max(max, streak); });
+if (max > bestStreak.streak) bestStreak = { name: byId(id)?.name, streak: max };
+});
+if (bestStreak.name && bestStreak.streak >= 3) facts.push({ emoji: "🚀", text: `<strong>${bestStreak.name}</strong> is riding a hot streak — <strong>${bestStreak.streak} wins in a row</strong>! Can anyone stop them?` });
+
+// 13. Iron man — player who's played the most games total
+const mostGames = [...players].sort((a,b) => b.matches - a.matches)[0];
+if (mostGames && mostGames.matches >= 5) facts.push({ emoji: "🏃", text: `<strong>${mostGames.name}</strong> has played the most games of anyone — <strong>${mostGames.matches} matches</strong> and still going strong. The heart of the group!` });
+
+// 16. Rival duo — two players who've faced each other the most as opponents
+const rivalStats = {};
+scored.forEach(h => {
+h.pairAIds.forEach(a => h.pairBIds.forEach(b => {
+const key = [a,b].sort().join("|");
+rivalStats[key] = (rivalStats[key] || 0) + 1;
+}));
+});
+const topRival = Object.entries(rivalStats).sort((a,b) => b[1]-a[1])[0];
+if (topRival && topRival[1] >= 3) {
+const [id1, id2] = topRival[0].split("|");
+const n1 = byId(id1)?.name, n2 = byId(id2)?.name;
+if (n1 && n2) facts.push({ emoji: "⚔️", text: `<strong>${n1}</strong> and <strong>${n2}</strong> have faced each other across the net <strong>${topRival[1]} times</strong> — the group's most compelling rivalry!` });
+}
+
+// 18. Lone wolf — player who wins alone (most solo-deciding wins i.e. teammate had fewer matches)
+// Proxy: player with highest wins who has the fewest unique partners
+const partnerCount = {};
+scored.forEach(h => {
+[{ ids: h.pairAIds }, { ids: h.pairBIds }].forEach(({ ids }) => {
+if (ids.length === 2) {
+partnerCount[ids[0]] = partnerCount[ids[0]] || new Set();
+partnerCount[ids[1]] = partnerCount[ids[1]] || new Set();
+partnerCount[ids[0]].add(ids[1]);
+partnerCount[ids[1]].add(ids[0]);
+}
+});
+});
+let loyalDuo = null, minPartners = Infinity;
+players.forEach(p => {
+if (p.wins >= 2 && partnerCount[p.id] && partnerCount[p.id].size < minPartners) {
+minPartners = partnerCount[p.id].size;
+loyalDuo = p;
+}
+});
+if (loyalDuo && minPartners === 1) {
+const partId = [...(partnerCount[loyalDuo.id] || [])][0];
+const partName = byId(partId)?.name;
+if (partName) facts.push({ emoji: "💞", text: `<strong>${loyalDuo.name}</strong> and <strong>${partName}</strong> have only ever partnered with each other — a loyal duo through and through!` });
+}
+
+// 20. Veteran — player with 0 losses (undefeated, min 3 games)
+players.forEach(p => {
+if (p.matches >= 3 && p.wins === p.matches) facts.push({ emoji: "👑", text: `<strong>${p.name}</strong> remains <strong>undefeated</strong> after ${p.matches} games. Royalty on the court!` });
+});
+
+// Shuffle and pick up to 3
+for (let i = facts.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[facts[i], facts[j]] = [facts[j], facts[i]];
+}
+return facts.slice(0, 3);
+}
+
+function renderFunFacts() {
+const card = document.getElementById("funFactsCard");
+const list = document.getElementById("funFactsList");
+const facts = computeFunFacts();
+if (!facts.length) { card.style.display = "none"; return; }
+card.style.display = "";
+list.innerHTML = facts.map(f => `
+<div style="display:flex;align-items:flex-start;gap:10px;background:#f8faff;border:1px solid #e1e9ff;border-radius:10px;padding:10px 12px;">
+<span style="font-size:20px;flex-shrink:0;line-height:1.4;">${f.emoji}</span>
+<span style="font-size:13px;color:#3b4e84;line-height:1.55;">${f.text}</span>
+</div>`).join("");
 }
 
 function renderLeaderboard() {
@@ -729,7 +957,6 @@ const rankClass = i < 3 ? rankClasses[i] : "";
 return `<tr>
 <td class="lb-rank ${rankClass}">${rankDisplay}</td>
 <td class="lb-name">${p.name}</td>
-<td class="lb-skill right">${p.skill.toFixed(1)}</td>
 <td class="lb-gp right">${p.matches}</td>
 <td class="lb-wins right">${p.wins}</td>
 <td class="lb-points right">${p.points}</td>
@@ -739,13 +966,13 @@ box.innerHTML = `<table class="lb-table">
 <thead><tr>
 <th class="lb-rank">#</th>
 <th>Name</th>
-<th class="right">Skill</th>
 <th class="right">GP</th>
 <th class="right">Won</th>
 <th class="right">Points</th>
 </tr></thead>
 <tbody>${rows}</tbody>
 </table>`;
+renderFunFacts();
 }
 
 document.getElementById("addPlayerBtn").onclick = () => {
