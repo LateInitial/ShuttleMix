@@ -37,7 +37,7 @@ border: 1px solid #c8d5fb;
 box-shadow: 0 14px 32px rgba(49, 79, 157, 0.2);
 min-height: 650px;
 resize: both;
-overflow: auto;
+overflow: hidden;
 min-width: 320px;
 }
 .screen {
@@ -45,7 +45,7 @@ background: linear-gradient(180deg, #fafdff, #eef4ff);
 border-radius: 20px;
 min-height: 630px;
 border: 1px solid #d2ddfb;
-overflow: hidden;
+overflow: visible;
 display: flex;
 flex-direction: column;
 }
@@ -69,11 +69,17 @@ cursor: pointer;
 .tab.active { color: #4f6fff; border-bottom: 2px solid #4f6fff; font-weight: 700; }
 .view { display: none; padding: 14px; gap: 12px; }
 .view.active { display: grid; }
+.toolbar-wrap {
+width: 100%;
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+}
 .toolbar {
 display: flex;
 gap: 8px;
-flex-wrap: wrap;
 align-items: center;
+flex-wrap: wrap;
+min-width: 0;
 }
 .toolbar input {
 padding: 8px 10px;
@@ -81,9 +87,11 @@ border-radius: 10px;
 border: 1px solid #cbd8ff;
 background: #fff;
 color: var(--text);
+min-width: 0;
 }
-.toolbar .name-input { min-width: 180px; }
-.toolbar .skill-input { width: 90px; }
+.toolbar .name-input { min-width: 130px; flex: 1 1 130px; }
+.toolbar .skill-input { width: 76px; flex: 0 0 76px; }
+button#addPlayerBtn, button#resetBtn { flex-shrink: 0; }
 
 /* Highlight toolbar when in edit mode */
 .toolbar.editing-mode .name-input,
@@ -97,6 +105,7 @@ display: none;
 font-size: 12px;
 color: #4f6fff;
 font-weight: 600;
+white-space: nowrap;
 align-self: center;
 }
 .toolbar.editing-mode .edit-mode-hint {
@@ -112,20 +121,19 @@ padding: 12px;
 .table-scroll {
 width: 100%;
 overflow-x: auto;
-overflow-y: hidden;
+overflow-y: visible;
 -webkit-overflow-scrolling: touch;
-padding-bottom: 4px;
-touch-action: pan-x pan-y;
+padding-bottom: 6px;
 }
 .table-inner {
-width: 100%;
-min-width: 0;
+min-width: 560px;
 }
+/* Fixed pixel columns — never shrink, always scroll if needed */
 .header-row, .row {
 display: grid;
-grid-template-columns: 28px minmax(96px, 1.75fr) 44px 34px 58px 46px 70px;
+grid-template-columns: 28px 140px 52px 36px 62px 50px 60px 52px;
 align-items: center;
-gap: 4px;
+gap: 6px;
 }
 .header-row {
 color: #6a769f;
@@ -163,10 +171,17 @@ text-align: center;
 justify-self: center;
 }
 .col-actions {
-text-align: right;
+text-align: center;
 display: flex;
 gap: 3px;
-justify-content: flex-end;
+justify-content: center;
+align-items: center;
+}
+.col-del {
+text-align: center;
+display: flex;
+gap: 3px;
+justify-content: center;
 align-items: center;
 }
 .toggle-wrap {
@@ -270,6 +285,7 @@ border: 0;
 padding: 0;
 box-shadow: none;
 resize: none;
+overflow: visible;
 }
 .screen {
 min-height: 100vh;
@@ -278,11 +294,10 @@ border: 0;
 }
 .view { padding: 10px; }
 .card { padding: 10px; border-radius: 12px; }
-.table-inner { width: max-content; min-width: 100%; }
 .header-row, .row {
 font-size: 12px;
-grid-template-columns: 24px minmax(86px, 1.65fr) 40px 30px 54px 42px 66px;
-gap: 2px;
+grid-template-columns: 24px 120px 46px 30px 54px 44px 54px 44px;
+gap: 3px;
 }
 button.small { padding: 4px 5px; font-size: 10px; }
 .pair-grid { grid-template-columns: 1fr; }
@@ -304,6 +319,7 @@ button.small { padding: 4px 5px; font-size: 10px; }
 </div>
 <section id="playersView" class="view active">
 <div class="card">
+<div class="toolbar-wrap">
 <div class="toolbar" id="toolbar">
 <input id="nameInput" class="name-input" placeholder="Player name" />
 <input id="skillInput" class="skill-input" type="number" min="1" max="10" step="0.1" placeholder="Skill" />
@@ -312,10 +328,11 @@ button.small { padding: 4px 5px; font-size: 10px; }
 <span class="edit-mode-hint">✏️ Editing — update fields above &amp; press Save</span>
 </div>
 </div>
+</div>
 <div class="card">
 <div class="table-scroll">
 <div class="table-inner">
-<div class="header-row"><div>#</div><div>Name</div><div class="col-skill">Skill</div><div class="col-games">GP</div><div class="col-priority">Priority</div><div class="col-skip">Skip</div><div class="col-actions">Act</div></div>
+<div class="header-row"><div>#</div><div>Name</div><div class="col-skill">Skill</div><div class="col-games">GP</div><div class="col-priority">Priority</div><div class="col-skip">Skip</div><div class="col-actions">Edit</div><div class="col-del">Del</div></div>
 <div id="playersTable"></div>
 </div>
 </div>
@@ -334,7 +351,7 @@ button.small { padding: 4px 5px; font-size: 10px; }
 </section>
 <section id="historyView" class="view">
 <div class="card">
-<div id="stats" class="muted">No matches yet.</div>
+<div id="stats" class="muted" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">No matches yet.</div>
 <div id="historyList"></div>
 </div>
 </section>
@@ -506,9 +523,10 @@ else if (p.skip) rowClass += " skip";
 else if (p.priority) rowClass += " priority";
 row.className = rowClass;
 
-const actionsHTML = isEditing
-  ? `<button class="small save-btn" data-role="save" data-id="${p.id}" title="Save changes">Save</button><button class="small danger" data-role="delete" data-id="${p.id}" title="Delete player">Del</button>`
+const editHTML = isEditing
+  ? `<button class="small save-btn" data-role="save" data-id="${p.id}" title="Save changes">Save</button>`
   : `<button class="small edit-btn" data-role="edit" data-id="${p.id}" title="Edit player">Edit</button>`;
+const delHTML = `<button class="small danger" data-role="delete" data-id="${p.id}" title="Delete player">Del</button>`;
 
 row.innerHTML = `
 <div>${idx + 1}</div>
@@ -517,7 +535,8 @@ row.innerHTML = `
 <div class="col-games">${p.matches}</div>
 <div class="toggle-wrap"><input type="checkbox" ${p.priority ? "checked" : ""} data-role="priority" data-id="${p.id}" ${p.skip ? "disabled" : ""}></div>
 <div class="toggle-wrap"><input type="checkbox" ${p.skip ? "checked" : ""} data-role="skip" data-id="${p.id}"></div>
-<div class="col-actions">${actionsHTML}</div>
+<div class="col-actions">${editHTML}</div>
+<div class="col-del">${delHTML}</div>
 `;
 table.appendChild(row);
 });
@@ -561,8 +580,12 @@ saveEditedPlayer();
 
 document.querySelectorAll('[data-role="delete"]').forEach(el => {
 el.onclick = (e) => {
-players = players.filter(p => p.id !== e.target.dataset.id);
-if (editingId === e.target.dataset.id) setEditMode(null);
+const id = e.target.dataset.id;
+const player = byId(id);
+const confirmed = confirm(`Delete "${player ? player.name : 'this player'}"? This cannot be undone.`);
+if (!confirmed) return;
+players = players.filter(p => p.id !== id);
+if (editingId === id) setEditMode(null);
 else renderPlayers();
 renderStats();
 };
@@ -618,7 +641,30 @@ const least = [...players].sort((a,b) => a.matches - b.matches)[0];
 const avgDelta = history.length
 ? (history.reduce((acc, h) => acc + h.pairDelta, 0) / history.length).toFixed(2)
 : "n/a";
-stats.innerHTML = `Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong>`;
+stats.innerHTML = `<span>Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong></span><button id="saveAllBtn" class="small save-btn" title="Save all scores at once" style="margin-left:auto;padding:6px 12px;font-size:12px;">Save All</button>`;
+const saveAllBtn = document.getElementById("saveAllBtn");
+if (saveAllBtn) {
+  saveAllBtn.onclick = () => {
+    const unscoredIds = history.filter(h => h.scoreA === null).map(h => h.id);
+    const toSave = [];
+    unscoredIds.forEach(hid => {
+      const saEl = document.getElementById(`sa-${hid}`);
+      const sbEl = document.getElementById(`sb-${hid}`);
+      if (saEl && sbEl && saEl.value !== "" && sbEl.value !== "") {
+        toSave.push({ hid, a: saEl.value, b: sbEl.value });
+      }
+    });
+    if (!toSave.length) return alert("No scores to save. Enter scores in one or more matches first.");
+    let errors = [];
+    toSave.forEach(({ hid, a, b }) => {
+      const av = parseInt(a), bv = parseInt(b);
+      if (isNaN(av) || isNaN(bv) || av < 0 || bv < 0) { errors.push(`Invalid score for match ${hid}`); return; }
+      if (av === bv) { const h = history.find(x => x.id === hid); errors.push(`Draw not allowed: ${h ? h.pairA.join("/") + " vs " + h.pairB.join("/") : hid}`); return; }
+      saveScore(hid, a, b);
+    });
+    if (errors.length) alert("Some scores could not be saved:\n" + errors.join("\n"));
+  };
+}
 }
 
 function deleteMatch(histId) {
@@ -919,12 +965,29 @@ players.forEach(p => {
 if (p.matches >= 3 && p.wins === p.matches) facts.push({ emoji: "👑", text: `<strong>${p.name}</strong> remains <strong>undefeated</strong> after ${p.matches} games. Royalty on the court!` });
 });
 
-// Shuffle and pick up to 3
+// Shuffle all candidates first
 for (let i = facts.length - 1; i > 0; i--) {
 const j = Math.floor(Math.random() * (i + 1));
 [facts[i], facts[j]] = [facts[j], facts[i]];
 }
-return facts.slice(0, 3);
+// Deduplicate: no player should be the solo subject of more than one fact.
+// Detect which player names appear in each fact text, then check against our player list.
+const playerNames = players.map(p => p.name);
+const usedSoloNames = new Set();
+const chosen = [];
+for (const f of facts) {
+if (chosen.length >= 3) break;
+const namesInFact = playerNames.filter(n => f.text.includes(`<strong>${n}</strong>`));
+// A "solo" fact features exactly one player name from our roster
+const isSoloFact = namesInFact.length === 1;
+if (isSoloFact) {
+const name = namesInFact[0];
+if (usedSoloNames.has(name)) continue;
+usedSoloNames.add(name);
+}
+chosen.push(f);
+}
+return chosen;
 }
 
 function renderFunFacts() {
