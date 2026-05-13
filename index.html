@@ -278,6 +278,76 @@ align-items: center;
 margin-top: 8px;
 }
 .pair { background: #eef3ff; border-radius: 10px; padding: 10px; min-height: 110px; }
+.match-layout-header {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-end;
+justify-content: space-between;
+gap: 14px;
+margin-bottom: 4px;
+}
+.court-segments {
+display: inline-flex;
+border-radius: 12px;
+background: #e8eeff;
+padding: 4px;
+border: 1px solid #c8d5fb;
+gap: 2px;
+}
+.court-segment {
+border: 0;
+background: transparent;
+padding: 8px 16px;
+border-radius: 9px;
+font-weight: 600;
+font-size: 13px;
+color: #6f7ca3;
+cursor: pointer;
+}
+.court-segment.active {
+background: #fff;
+color: #4f6fff;
+box-shadow: 0 1px 4px rgba(79,111,255,0.15);
+}
+.courts-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 14px;
+margin-top: 4px;
+}
+@media (max-width: 720px) {
+.courts-grid { grid-template-columns: 1fr; }
+}
+.court-card {
+background: linear-gradient(180deg, #fafdff, #f3f6ff);
+border: 1px solid #d8e3ff;
+border-radius: 14px;
+padding: 12px;
+min-height: 0;
+}
+.court-card.court-empty {
+background: #f8f9fc;
+border-style: dashed;
+}
+.court-card-head {
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+color: #6a769f;
+margin-bottom: 8px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 8px;
+flex-wrap: wrap;
+}
+.court-card-actions {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-top: 12px;
+}
 .tag {
 display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; margin: 3px 3px 0 0;
 background: #e5ecff; color: #3b4e84;
@@ -389,6 +459,7 @@ font-size: 13px;
 padding: 7px 8px;
 }
 .pair-grid { grid-template-columns: 1fr; }
+.match-layout-header { flex-direction: column; align-items: stretch; }
 }
 </style>
 </head>
@@ -428,13 +499,25 @@ padding: 7px 8px;
 </section>
 <section id="matchView" class="view">
 <div class="card">
-<div class="toolbar">
-<button id="generateBtn" class="primary">Generate Next Match</button>
+<div class="match-layout-header">
+<div>
+<div class="muted" style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Courts</div>
+<div class="court-segments" role="group" aria-label="Number of courts">
+<button type="button" class="court-segment" data-set-courts="1">1 court</button>
+<button type="button" class="court-segment" data-set-courts="2">2 courts</button>
+</div>
+</div>
+<div style="flex:1;min-width:200px;">
+<button id="generateBtn" class="primary" style="width:100%;max-width:300px;">Generate Next Match</button>
+</div>
+</div>
+<p class="muted" id="matchCourtHint" style="margin-top:8px;line-height:1.5;">One match at a time — all active players (except skipped) can be drawn.</p>
+<div class="toolbar" style="margin-top:10px;">
 <button id="confirmBtn">Confirm Match Start</button>
 <button id="rerollBtn">Reroll</button>
 </div>
 <div class="muted" style="margin-top:8px;">Logic priority: fairness gap, skill similarity, pair average balance, avoid exact repeat pairings.</div>
-<div id="matchResult" style="margin-top:10px;"></div>
+<div id="matchResult" style="margin-top:12px;"></div>
 </div>
 </section>
 <section id="historyView" class="view">
@@ -486,7 +569,11 @@ let players = JSON.parse(localStorage.getItem("shuttlemix_players") || "null") |
 // Migrate: ensure wins field exists
 players.forEach(p => { if (p.wins === undefined) p.wins = 0; if (p.points === undefined) p.points = 0; });
 let history = JSON.parse(localStorage.getItem("shuttlemix_history") || "[]");
-let currentMatch = null;
+let courtCount = (() => {
+const v = parseInt(localStorage.getItem("shuttlemix_court_count") || "1", 10);
+return v === 2 ? 2 : 1;
+})();
+let pendingByCourt = { 1: null, 2: null };
 let editingId = null; // track which player is being edited
 
 const seenPairings = new Set(JSON.parse(localStorage.getItem("shuttlemix_seen") || "[]"));
@@ -495,6 +582,7 @@ const save = () => {
 localStorage.setItem("shuttlemix_players", JSON.stringify(players));
 localStorage.setItem("shuttlemix_history", JSON.stringify(history));
 localStorage.setItem("shuttlemix_seen", JSON.stringify(Array.from(seenPairings)));
+localStorage.setItem("shuttlemix_court_count", String(courtCount));
 };
 
 function pairKey(idsA, idsB) {
@@ -524,22 +612,20 @@ out.push([splitA, splitB], [splitC, splitD], [splitE, splitF]);
 return out;
 }
 
-function chooseMatch() {
-const active = players.filter(p => !p.skip);
-if (active.length < 4) return { error: "Need at least 4 active players (skip off)." };
+function chooseMatch(opts) {
+const ex = opts && opts.excludeIds instanceof Set ? opts.excludeIds : new Set((opts && opts.excludeIds) || []);
+const active = players.filter(p => !p.skip && !ex.has(p.id));
+if (active.length < 4) return { error: "Need at least 4 available active players (not skipped, and not already on the other court’s lineup)." };
 const priorities = active.filter(p => p.priority);
 const high = Math.max(...active.map(p => p.matches));
 const fairnessPool = active.filter(p => p.matches >= high - 1);
 const lowPool = active.filter(p => p.matches <= high - 2);
-// Always keep priority players in the candidate pool even if they've played more
 let candidatePool = lowPool.length > 0 ? [...new Set([...lowPool, ...fairnessPool])] : active;
 if (priorities.length) {
 candidatePool = [...new Set([...candidatePool, ...priorities])];
 }
 const lineups = allLineups(candidatePool);
 if (!lineups.length) return { error: "No valid lineup found." };
-// Try with fairness cap starting at 2, relaxing by 1 each pass until a lineup is found.
-// This keeps fairness as tight as possible while still accommodating priority players.
 let best = null;
 for (let maxGap = 2; maxGap <= active.length && !best; maxGap++) {
 for (const [a, b] of lineups) {
@@ -547,7 +633,8 @@ const everyone = [...a, ...b];
 if (priorities.length && !priorities.some(pr => everyone.some(p => p.id === pr.id))) continue;
 const projected = players.map(p => ({ ...p }));
 for (const p of everyone) {
-projected.find(x => x.id === p.id).matches += 1;
+const o = projected.find(x => x.id === p.id);
+if (o) o.matches += 1;
 }
 const activeProjected = projected.filter(p => !p.skip);
 const maxGames = Math.max(...activeProjected.map(p => p.matches));
@@ -570,6 +657,120 @@ best = { a, b, avgA, avgB, spread, pairDelta, fairnessGap, repeated, key, score 
 }
 if (!best) return { error: "No valid lineup found. Add more players or adjust skip toggles." };
 return best;
+}
+
+function idsFromPendingCourt(c) {
+const m = pendingByCourt[c];
+if (!m) return new Set();
+return new Set([...m.a, ...m.b].map(p => p.id));
+}
+
+function updateMatchToolbar() {
+const hint = document.getElementById("matchCourtHint");
+if (hint) {
+hint.textContent = courtCount === 1
+? "One match at a time — all active players (except skipped) can be drawn."
+: "Two courts use eight different players: Court 2 is chosen only from players not on Court 1. Confirm each court when that game actually starts.";
+}
+const conf = document.getElementById("confirmBtn");
+const rer = document.getElementById("rerollBtn");
+if (conf) conf.style.display = courtCount === 1 ? "" : "none";
+if (rer) rer.style.display = courtCount === 1 ? "" : "none";
+document.querySelectorAll(".court-segment").forEach(btn => {
+btn.classList.toggle("active", Number(btn.dataset.setCourts) === courtCount);
+});
+const gen = document.getElementById("generateBtn");
+if (gen) gen.textContent = courtCount === 1 ? "Generate Next Match" : "Generate lineups";
+}
+
+function matchTagsHtml(m) {
+return `<div style="margin-top:8px;">
+<span class="tag good">Games fairness gap: ${m.fairnessGap}</span>
+<span class="tag ${m.spread <= 2.5 ? "good" : "warn"}">Skill spread: ${m.spread.toFixed(2)}</span>
+<span class="tag ${m.pairDelta <= 0.8 ? "good" : "warn"}">Pair avg delta: ${m.pairDelta.toFixed(2)}</span>
+<span class="tag ${m.repeated ? "warn" : "good"}">${m.repeated ? "Repeat pairing used" : "Repeat pairing avoided"}</span>
+</div>`;
+}
+
+function pairGridHtml(m) {
+return `<div class="pair-grid">
+<div class="pair"><strong>Pair A</strong><br>${m.a[0].name} (${m.a[0].skill.toFixed(1)})<br>${m.a[1].name} (${m.a[1].skill.toFixed(1)})<br><span class="muted">Avg ${m.avgA.toFixed(2)}</span></div>
+<div><strong>VS</strong></div>
+<div class="pair"><strong>Pair B</strong><br>${m.b[0].name} (${m.b[0].skill.toFixed(1)})<br>${m.b[1].name} (${m.b[1].skill.toFixed(1)})<br><span class="muted">Avg ${m.avgB.toFixed(2)}</span></div>
+</div>
+${matchTagsHtml(m)}`;
+}
+
+function doGenerateMatches() {
+if (courtCount === 1) {
+const pick = chooseMatch({ excludeIds: new Set() });
+if (pick.error) return alert(pick.error);
+pendingByCourt[1] = pick;
+pendingByCourt[2] = null;
+renderMatch();
+updateMatchToolbar();
+document.querySelector('[data-view="matchView"]')?.click();
+return;
+}
+if (pendingByCourt[1] && pendingByCourt[2]) {
+return alert("Both courts already have lineups. Confirm a match to record GP, or use “Reroll this court” on a card to change it.");
+}
+if (!pendingByCourt[1]) {
+const pick = chooseMatch({ excludeIds: idsFromPendingCourt(2) });
+if (pick.error) return alert(pick.error);
+pendingByCourt[1] = pick;
+}
+if (!pendingByCourt[2]) {
+const pick2 = chooseMatch({ excludeIds: idsFromPendingCourt(1) });
+if (pick2.error) {
+return alert("Could not fill Court 2: " + pick2.error + " You need at least eight active players (not skipped) split across both courts, or confirm Court 1 first to free players.");
+}
+pendingByCourt[2] = pick2;
+}
+renderMatch();
+updateMatchToolbar();
+document.querySelector('[data-view="matchView"]')?.click();
+}
+
+function doConfirmCourt(courtNum) {
+const m = pendingByCourt[courtNum];
+if (!m) return alert("No match to confirm for that court.");
+const everyone = [...m.a, ...m.b];
+everyone.forEach(p => {
+const player = byId(p.id);
+if (player) player.matches += 1;
+});
+seenPairings.add(m.key);
+history.push({
+id: crypto.randomUUID(),
+time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+pairA: m.a.map(p => p.name),
+pairB: m.b.map(p => p.name),
+pairAIds: m.a.map(p => p.id),
+pairBIds: m.b.map(p => p.id),
+pairDelta: m.pairDelta,
+repeated: Boolean(m.repeated),
+scoreA: null,
+scoreB: null,
+court: courtCount === 2 ? courtNum : null
+});
+pendingByCourt[courtNum] = null;
+save();
+renderPlayers();
+renderMatch();
+renderHistory();
+renderLeaderboard();
+}
+
+function doRerollCourt(courtNum) {
+const m = pendingByCourt[courtNum];
+if (m) seenPairings.add(m.key);
+const other = courtNum === 1 ? 2 : 1;
+const pick = chooseMatch({ excludeIds: idsFromPendingCourt(other) });
+if (pick.error) return alert(pick.error);
+pendingByCourt[courtNum] = pick;
+save();
+renderMatch();
 }
 
 function setEditMode(id) {
@@ -699,23 +900,27 @@ renderStats();
 
 function renderMatch() {
 const box = document.getElementById("matchResult");
-if (!currentMatch) {
+if (courtCount === 1) {
+if (!pendingByCourt[1]) {
 box.innerHTML = '<div class="muted">No match generated yet.</div>';
 return;
 }
-box.innerHTML = `
-<div class="pair-grid">
-<div class="pair"><strong>Pair A</strong><br>${currentMatch.a[0].name} (${currentMatch.a[0].skill.toFixed(1)})<br>${currentMatch.a[1].name} (${currentMatch.a[1].skill.toFixed(1)})<br><span class="muted">Avg ${currentMatch.avgA.toFixed(2)}</span></div>
-<div><strong>VS</strong></div>
-<div class="pair"><strong>Pair B</strong><br>${currentMatch.b[0].name} (${currentMatch.b[0].skill.toFixed(1)})<br>${currentMatch.b[1].name} (${currentMatch.b[1].skill.toFixed(1)})<br><span class="muted">Avg ${currentMatch.avgB.toFixed(2)}</span></div>
-</div>
-<div style="margin-top:8px;">
-<span class="tag good">Games fairness gap: ${currentMatch.fairnessGap}</span>
-<span class="tag ${currentMatch.spread <= 2.5 ? "good" : "warn"}">Skill spread: ${currentMatch.spread.toFixed(2)}</span>
-<span class="tag ${currentMatch.pairDelta <= 0.8 ? "good" : "warn"}">Pair avg delta: ${currentMatch.pairDelta.toFixed(2)}</span>
-<span class="tag ${currentMatch.repeated ? "warn" : "good"}">${currentMatch.repeated ? "Repeat pairing used" : "Repeat pairing avoided"}</span>
-</div>
-`;
+box.innerHTML = pairGridHtml(pendingByCourt[1]);
+return;
+}
+const blocks = [1, 2].map(cn => {
+const m = pendingByCourt[cn];
+if (!m) {
+return `<div class="court-card court-empty"><div class="court-card-head"><span>Court ${cn}</span></div><div class="muted" style="padding:4px 0 8px;line-height:1.45;">No lineup yet — <strong>Generate lineups</strong> fills empty courts (needs eight active players for both at once).</div></div>`;
+}
+return `<div class="court-card"><div class="court-card-head"><span>Court ${cn}</span><span class="muted" style="text-transform:none;font-weight:600;letter-spacing:0;font-size:12px;">Ready</span></div>
+${pairGridHtml(m)}
+<div class="court-card-actions">
+<button type="button" class="primary small confirm-court-btn" data-court="${cn}">Confirm start</button>
+<button type="button" class="secondary small reroll-court-btn" data-court="${cn}">Reroll this court</button>
+</div></div>`;
+}).join("");
+box.innerHTML = `<div class="courts-grid">${blocks}</div>`;
 }
 
 function renderStats() {
@@ -837,6 +1042,7 @@ item.innerHTML = `
 ${scoreDisplay}
 <span class="tag ${h.repeated ? "warn" : "good"}" style="white-space:nowrap">${h.repeated ? "Repeat" : "Unique"}</span>
 ${winBadges}
+${h.court ? `<span class="tag" style="white-space:nowrap;background:#e8eeff;color:#4f6fff;border:1px solid #c8d5fb;">Court ${h.court}</span>` : ""}
 <span style="color:#b0b8d4;font-size:12px;white-space:nowrap">${h.time}</span>
 ${hasScore ? `<button class="score-edit-btn" data-hid="${h.id}">Edit match</button>` : ""}
 </div>
@@ -1154,9 +1360,9 @@ renderStats();
 document.getElementById("resetBtn").onclick = () => {
 players = JSON.parse(JSON.stringify(defaultPlayers));
 history = [];
-currentMatch = null;
 editingId = null;
 seenPairings.clear();
+pendingByCourt = { 1: null, 2: null };
 // Reset toolbar state too
 const toolbar = document.getElementById("toolbar");
 const addBtn = document.getElementById("addPlayerBtn");
@@ -1168,50 +1374,25 @@ renderPlayers();
 renderMatch();
 renderHistory();
 renderLeaderboard();
-};
-
-document.getElementById("generateBtn").onclick = () => {
-const pick = chooseMatch();
-if (pick.error) return alert(pick.error);
-currentMatch = pick;
-renderMatch();
-document.querySelector('[data-view="matchView"]').click();
-};
-
-document.getElementById("rerollBtn").onclick = () => {
-if (currentMatch) seenPairings.add(currentMatch.key);
-const pick = chooseMatch();
-if (pick.error) return alert(pick.error);
-currentMatch = pick;
-renderMatch();
 save();
 };
 
-document.getElementById("confirmBtn").onclick = () => {
-if (!currentMatch) return alert("Generate a match first.");
-const everyone = [...currentMatch.a, ...currentMatch.b];
-everyone.forEach(p => {
-const player = byId(p.id);
-if (player) player.matches += 1;
-});
-seenPairings.add(currentMatch.key);
-history.push({
-id: crypto.randomUUID(),
-time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-pairA: currentMatch.a.map(p => p.name),
-pairB: currentMatch.b.map(p => p.name),
-pairAIds: currentMatch.a.map(p => p.id),
-pairBIds: currentMatch.b.map(p => p.id),
-pairDelta: currentMatch.pairDelta,
-repeated: Boolean(currentMatch.repeated),
-scoreA: null,
-scoreB: null
-});
-currentMatch = null;
-renderPlayers();
+document.getElementById("generateBtn").onclick = () => {
+doGenerateMatches();
+};
+
+document.getElementById("rerollBtn").onclick = () => {
+if (pendingByCourt[1]) seenPairings.add(pendingByCourt[1].key);
+const pick = chooseMatch({ excludeIds: new Set() });
+if (pick.error) return alert(pick.error);
+pendingByCourt[1] = pick;
+pendingByCourt[2] = null;
+save();
 renderMatch();
-renderHistory();
-renderLeaderboard();
+};
+
+document.getElementById("confirmBtn").onclick = () => {
+doConfirmCourt(1);
 };
 
 document.querySelectorAll(".tab").forEach(tab => {
@@ -1222,6 +1403,33 @@ tab.classList.add("active");
 document.getElementById(tab.dataset.view).classList.add("active");
 };
 });
+
+document.getElementById("matchResult").addEventListener("click", (e) => {
+const rr = e.target.closest(".reroll-court-btn");
+if (rr) {
+doRerollCourt(Number(rr.dataset.court));
+return;
+}
+const cc = e.target.closest(".confirm-court-btn");
+if (cc) {
+doConfirmCourt(Number(cc.dataset.court));
+}
+});
+
+document.querySelectorAll(".court-segment").forEach(btn => {
+btn.onclick = () => {
+const n = Number(btn.dataset.setCourts);
+if (n === courtCount) return;
+courtCount = n;
+localStorage.setItem("shuttlemix_court_count", String(n));
+if (courtCount === 1) pendingByCourt[2] = null;
+updateMatchToolbar();
+renderMatch();
+save();
+};
+});
+
+updateMatchToolbar();
 
 renderPlayers();
 renderMatch();
