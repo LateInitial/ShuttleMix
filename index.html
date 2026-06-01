@@ -16,6 +16,10 @@
 --ok-border: #7ecfa0;
 --skip: #fde7e8;
 --skip-border: #ef9ba0;
+--text-sm: 12px;
+--text-base: 14px;
+--text-md: 15px;
+--leading-tight: 1.35;
 }
 * { box-sizing: border-box; }
 body {
@@ -269,15 +273,46 @@ border-radius: 10px;
 }
 button.edit-btn { background: #4f6fff; }
 button.save-btn { background: #22a96e; }
-.muted { color: var(--muted); font-size: 13px; }
+.muted { color: var(--muted); font-size: var(--text-sm); line-height: var(--leading-tight); }
 .pair-grid {
 display: grid;
 grid-template-columns: 1fr auto 1fr;
-gap: 10px;
-align-items: center;
-margin-top: 8px;
+gap: 8px;
+align-items: stretch;
+margin-top: 6px;
 }
-.pair { background: #eef3ff; border-radius: 10px; padding: 10px; min-height: 110px; }
+.pair {
+background: #eef3ff;
+border-radius: 10px;
+padding: 8px 10px 6px;
+min-height: 0;
+display: flex;
+flex-direction: column;
+gap: 2px;
+justify-content: flex-start;
+}
+.pair-player {
+font-size: var(--text-base);
+font-weight: 600;
+line-height: var(--leading-tight);
+color: var(--text);
+}
+.pair-avg {
+font-size: 11px;
+line-height: 1.25;
+margin-top: 1px;
+padding-top: 3px;
+border-top: 1px solid rgba(79, 111, 255, 0.12);
+}
+.pair-vs {
+font-weight: 800;
+font-size: 13px;
+color: #6a769f;
+text-align: center;
+align-self: center;
+padding: 0 2px;
+}
+.match-tags { margin-top: 6px; }
 .match-layout-header {
 display: flex;
 flex-wrap: wrap;
@@ -288,6 +323,8 @@ margin-bottom: 4px;
 }
 .court-segments {
 display: inline-flex;
+flex-wrap: wrap;
+max-width: 100%;
 border-radius: 12px;
 background: #e8eeff;
 padding: 4px;
@@ -297,24 +334,82 @@ gap: 2px;
 .court-segment {
 border: 0;
 background: transparent;
-padding: 8px 16px;
+padding: 8px 12px;
 border-radius: 9px;
 font-weight: 600;
-font-size: 13px;
+font-size: 12px;
 color: #6f7ca3;
 cursor: pointer;
+white-space: nowrap;
 }
 .court-segment.active {
 background: #fff;
 color: #4f6fff;
 box-shadow: 0 1px 4px rgba(79,111,255,0.15);
 }
+.lb-style-header {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-end;
+justify-content: space-between;
+gap: 12px;
+margin-bottom: 14px;
+}
+.ranking-style-segments {
+display: inline-flex;
+border-radius: 12px;
+background: #e8eeff;
+padding: 4px;
+border: 1px solid #c8d5fb;
+gap: 2px;
+}
+.ranking-style-segment {
+border: 0;
+background: transparent;
+padding: 8px 14px;
+border-radius: 9px;
+font-weight: 600;
+font-size: 13px;
+color: #6f7ca3;
+cursor: pointer;
+}
+.ranking-style-segment.active {
+background: #fff;
+color: #4f6fff;
+box-shadow: 0 1px 4px rgba(79,111,255,0.15);
+}
+.format-segments {
+display: inline-flex;
+border-radius: 12px;
+background: #e8eeff;
+padding: 4px;
+border: 1px solid #c8d5fb;
+gap: 2px;
+}
+.format-segment {
+border: 0;
+background: transparent;
+padding: 8px 14px;
+border-radius: 9px;
+font-weight: 600;
+font-size: 13px;
+color: #6f7ca3;
+cursor: pointer;
+}
+.format-segment.active {
+background: #fff;
+color: #4f6fff;
+box-shadow: 0 1px 4px rgba(79,111,255,0.15);
+}
+.match-layout-header .header-block { min-width: 0; }
+.draw-badge { background: #eef3ff; color: #4f6fff; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
 .courts-grid {
 display: grid;
-grid-template-columns: 1fr 1fr;
+grid-template-columns: repeat(2, 1fr);
 gap: 14px;
 margin-top: 4px;
 }
+.courts-grid.courts-1 { grid-template-columns: 1fr; }
 @media (max-width: 720px) {
 .courts-grid { grid-template-columns: 1fr; }
 }
@@ -328,6 +423,90 @@ min-height: 0;
 .court-card.court-empty {
 background: #f8f9fc;
 border-style: dashed;
+}
+.court-card.court-live {
+background: linear-gradient(180deg, #fff9e8, #fff4dc);
+border-color: #e8c96a;
+}
+.court-card.court-live .court-card-head span:last-child {
+color: #8d5f1f;
+}
+.end-match-panel {
+margin-top: 14px;
+padding: 12px 14px;
+border-radius: 12px;
+background: #fff;
+border: 1px solid #e8dcc0;
+box-shadow: 0 1px 0 rgba(141, 95, 31, 0.06);
+}
+.end-match-title {
+font-size: 13px;
+font-weight: 700;
+color: #1b2340;
+margin: 0 0 4px;
+}
+.end-match-hint {
+margin: 0 0 8px;
+font-size: 12px;
+color: var(--muted);
+line-height: 1.4;
+}
+.end-match-scores {
+margin-bottom: 8px;
+}
+.end-score-stack {
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+.end-score-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+min-height: 0;
+}
+.end-score-names {
+font-size: 13px;
+font-weight: 600;
+color: var(--text);
+line-height: 1.3;
+flex: 1 1 auto;
+min-width: 0;
+}
+.end-match-scores input[type=number] {
+width: 42px;
+flex-shrink: 0;
+padding: 4px 2px;
+border-radius: 8px;
+border: 1px solid #d4c4a0;
+background: #fffdf8;
+font-size: 14px;
+font-weight: 700;
+text-align: center;
+color: var(--text);
+}
+.end-score-vs {
+font-weight: 800;
+font-size: 13px;
+color: #6a769f;
+text-align: center;
+line-height: 1;
+margin: 0;
+padding: 0;
+letter-spacing: 0.02em;
+}
+.end-match-actions {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
+.end-match-actions button.end-no-score-btn {
+background: #9aa3c4;
+}
+@media (min-width: 480px) and (max-width: 760px) {
+.end-match-actions { flex-direction: row; }
+.end-match-actions button { width: auto; flex: 1; }
 }
 .court-card-head {
 font-size: 11px;
@@ -349,38 +528,115 @@ gap: 8px;
 margin-top: 12px;
 }
 .tag {
-display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; margin: 3px 3px 0 0;
-background: #e5ecff; color: #3b4e84;
+display: inline-block; padding: 3px 7px; border-radius: 999px; font-size: 11px; margin: 2px 4px 0 0;
+background: #e5ecff; color: #3b4e84; line-height: 1.25;
 }
 .tag.good { background: #dcf4e7; color: #246547; }
 .tag.warn { background: #fff0d8; color: #8d5f1f; }
 .history-item {
 border-left: 3px solid #4f6fff;
-padding: 10px 12px;
+padding: 8px 10px;
 background: #eef3ff;
 border-radius: 10px;
-margin-top: 8px;
+margin-top: 6px;
 }
-.history-main { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-.history-matchup { font-weight: 600; font-size: 14px; flex: 1; min-width: 0; }
-.history-score-display {
-font-size: 20px; font-weight: 800; letter-spacing: 1px;
-padding: 2px 10px; border-radius: 8px;
-background: #fff; border: 1px solid #c8d5fb;
+.history-top {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 8px;
+min-width: 0;
+}
+.history-matchup {
+font-weight: 600;
+font-size: 13px;
+line-height: 1.35;
+flex: 1 1 auto;
+min-width: 0;
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+gap: 3px 5px;
+}
+.history-matchup .hist-team-a,
+.history-matchup .hist-team-b {
 color: var(--text);
+font-weight: 600;
+}
+.history-matchup .hist-team-winner {
+color: #4f6fff;
+font-weight: 800;
+}
+.history-matchup .hist-vs {
+color: #6a769f;
+font-weight: 800;
+font-size: 12px;
+}
+.history-score-display {
+font-size: 15px;
+font-weight: 800;
+letter-spacing: 0.3px;
+padding: 2px 8px;
+border-radius: 8px;
+background: #fff;
+border: 1px solid #c8d5fb;
+color: var(--text);
+flex-shrink: 0;
+line-height: 1.2;
+}
+.history-meta {
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+gap: 4px 6px;
+margin-top: 5px;
+}
+.history-meta .hist-time {
+color: #b0b8d4;
+font-size: 11px;
+white-space: nowrap;
 }
 .history-score-display .winner { color: #22a96e; }
 .history-score-display .loser { color: #b0b8d4; }
+.history-score-display .hist-score-sep {
+color: #b0b8d4;
+font-weight: 500;
+font-size: 12px;
+margin: 0 2px;
+}
+.tag.hist-court-tag {
+background: #e8eeff;
+color: #4f6fff;
+border: 1px solid #c8d5fb;
+}
 .score-entry {
-display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap;
+display: flex;
+align-items: center;
+gap: 6px;
+margin-top: 6px;
+flex-wrap: wrap;
 }
 .score-entry input[type=number] {
-width: 52px; padding: 5px 6px; border-radius: 8px;
-border: 1px solid #c2d0ff; background: #fff;
-font-size: 15px; font-weight: 700; text-align: center; color: var(--text);
+width: 42px;
+padding: 4px 2px;
+border-radius: 8px;
+border: 1px solid #c2d0ff;
+background: #fff;
+font-size: 14px;
+font-weight: 700;
+text-align: center;
+color: var(--text);
 }
-.score-entry .sep { font-weight: 700; color: var(--muted); }
-.score-entry .pair-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+.score-entry .sep { font-weight: 700; color: var(--muted); font-size: 12px; }
+.score-entry .pair-label {
+font-size: 13px;
+color: var(--text);
+font-weight: 600;
+max-width: 38vw;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
 .score-save-btn { background: #22a96e; padding: 5px 10px; font-size: 12px; border-radius: 8px; }
 .score-edit-btn { background: #7c8ab8; padding: 4px 8px; font-size: 11px; border-radius: 7px; }
 .hist-del-btn { background: #d9585f; padding: 5px 9px; font-size: 12px; border-radius: 8px; margin-left: 2px; }
@@ -458,8 +714,44 @@ button.small { padding: 6px 7px; font-size: 12px; }
 font-size: 13px;
 padding: 7px 8px;
 }
-.pair-grid { grid-template-columns: 1fr; }
+.title { font-size: 24px; }
+.subtitle { font-size: 13px; }
+.tab { font-size: 12px; padding: 10px 4px; }
+.view { padding: 10px 8px; gap: 10px; }
+.card { padding: 10px 8px; }
+.muted, #matchCourtHint, #matchFormatHint { font-size: 12px; line-height: 1.45; }
+.pair-grid {
+grid-template-columns: 1fr;
+gap: 6px;
+}
+.pair-grid .pair-vs {
+padding: 2px 0;
+font-size: 12px;
+}
+.pair-player { font-size: 13px; }
+.pair-avg { font-size: 10px; }
 .match-layout-header { flex-direction: column; align-items: stretch; }
+.court-card { padding: 10px; }
+.court-card-head { font-size: 10px; margin-bottom: 6px; }
+.end-match-panel { padding: 8px 10px; margin-top: 8px; }
+.end-match-hint { margin-bottom: 6px; }
+.end-score-names { font-size: 13px; }
+.end-match-actions { flex-direction: column; gap: 6px; }
+.end-match-actions button { width: 100%; justify-content: center; padding: 8px 10px; }
+.history-item { padding: 7px 9px; margin-top: 5px; }
+.history-matchup { font-size: 12px; }
+.history-score-display { font-size: 14px; padding: 2px 7px; }
+.history-meta { margin-top: 4px; gap: 3px 5px; }
+.win-badge, .draw-badge { font-size: 10px; padding: 2px 6px; }
+.tag { font-size: 10px; padding: 2px 6px; margin: 0 4px 0 0; }
+#stats { font-size: 12px !important; line-height: 1.4; }
+.lb-table td { font-size: 14px; padding: 8px; }
+.lb-wins, .lb-points { font-size: 15px; }
+#playersView .row { font-size: 14px; }
+.match-layout-header .header-block { width: 100%; }
+#generateBtn { max-width: none !important; width: 100%; }
+.court-segment { padding: 7px 10px; font-size: 11px; }
+.format-segment, .ranking-style-segment { padding: 7px 12px; font-size: 12px; }
 }
 </style>
 </head>
@@ -500,14 +792,23 @@ padding: 7px 8px;
 <section id="matchView" class="view">
 <div class="card">
 <div class="match-layout-header">
-<div>
+<div class="header-block">
+<div class="muted" style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Format</div>
+<div class="format-segments" role="group" aria-label="Matchmaking format">
+<button type="button" class="format-segment active" data-matchmaking="americano">Americano</button>
+<button type="button" class="format-segment" data-matchmaking="mexicano">Mexicano</button>
+</div>
+</div>
+<div class="header-block">
 <div class="muted" style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Courts</div>
 <div class="court-segments" role="group" aria-label="Number of courts">
 <button type="button" class="court-segment" data-set-courts="1">1 court</button>
 <button type="button" class="court-segment" data-set-courts="2">2 courts</button>
+<button type="button" class="court-segment" data-set-courts="3">3 courts</button>
+<button type="button" class="court-segment" data-set-courts="4">4 courts</button>
 </div>
 </div>
-<div style="flex:1;min-width:200px;">
+<div class="header-block" style="flex:1;min-width:200px;">
 <button id="generateBtn" class="primary" style="width:100%;max-width:300px;">Generate Next Match</button>
 </div>
 </div>
@@ -516,7 +817,7 @@ padding: 7px 8px;
 <button id="confirmBtn">Confirm Match Start</button>
 <button id="rerollBtn">Reroll</button>
 </div>
-<div class="muted" style="margin-top:8px;">Logic priority: fairness gap, skill similarity, pair average balance, avoid exact repeat pairings.</div>
+<div class="muted" id="matchFormatHint" style="margin-top:8px;line-height:1.5;">Americano: balanced random draws. Priority players (max 4) are always included. Avoids the same partner or opponent back-to-back.</div>
 <div id="matchResult" style="margin-top:12px;"></div>
 </div>
 </section>
@@ -528,15 +829,24 @@ padding: 7px 8px;
 </section>
 <section id="leaderboardView" class="view">
 <div class="card">
+<div class="lb-style-header">
+<div>
+<div class="muted" style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Ranking style</div>
+<div class="ranking-style-segments" role="group" aria-label="Ranking style">
+<button type="button" class="ranking-style-segment active" data-scoring-style="points">Points style</button>
+<button type="button" class="ranking-style-segment" data-scoring-style="league">League style</button>
+</div>
+</div>
+</div>
 <div id="leaderboardTable"></div>
 </div>
 <div class="card" id="funFactsCard" style="margin-top:0;display:none;">
 <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#6a769f;margin-bottom:10px;">✨ Did You Know?</div>
 <div id="funFactsList" style="display:flex;flex-direction:column;gap:8px;"></div>
 </div>
-<div class="card" style="margin-top:0;">
+<div class="card" style="margin-top:0;" id="rankingsHelpCard">
 <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#6a769f;margin-bottom:10px;">How rankings work</div>
-<div style="display:flex;flex-direction:column;gap:7px;">
+<div id="rankingsHelpPoints" style="display:flex;flex-direction:column;gap:7px;">
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#fff4e0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#f5a623;flex-shrink:0;">1</span>
 <div><span style="font-weight:700;color:#1b2340;">Points</span> <span style="color:#5f6d94;font-size:13px;">— Your pair's score in each match is added to your total. Win 21–15 and you earn 21 pts; your opponents earn 15 pts each. More points = higher rank.</span></div>
@@ -548,6 +858,20 @@ padding: 7px 8px;
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
 <div><span style="font-weight:700;color:#1b2340;">Fewest Games Played</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player who achieved the same result in fewer games ranks higher. Efficiency matters.</span></div>
+</div>
+</div>
+<div id="rankingsHelpLeague" style="display:none;flex-direction:column;gap:7px;">
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#fff4e0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#f5a623;flex-shrink:0;">1</span>
+<div><span style="font-weight:700;color:#1b2340;">League points</span> <span style="color:#5f6d94;font-size:13px;">— If your pair wins the match, each player on that pair earns <strong>3 points</strong>. The losing pair earns <strong>0</strong>. If the match ends in a draw, <strong>every player earns 1 point</strong>.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#e6f8ee;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#22a96e;flex-shrink:0;">2</span>
+<div><span style="font-weight:700;color:#1b2340;">Wins</span> <span style="color:#5f6d94;font-size:13px;">— Match wins (not draws) are tracked separately. If league points are tied, more wins ranks higher.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
+<div><span style="font-weight:700;color:#1b2340;">Fewest Games Played</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player who reached the same standing in fewer games ranks higher.</span></div>
 </div>
 </div>
 </div>
@@ -562,18 +886,86 @@ const defaultPlayers = [
 { id: crypto.randomUUID(), name: "Nopi", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
 { id: crypto.randomUUID(), name: "Open", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
 { id: crypto.randomUUID(), name: "Michelle", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Sendy", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false }
+{ id: crypto.randomUUID(), name: "Sendy", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Rizky", skill: 8.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Connie", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Adi", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Angel", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Artyon", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Ucok", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Hengky", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Edbert", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Jeje", skill: 2.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Danny", skill: 3.0, matches: 0, wins: 0, points: 0, priority: false, skip: false }
 ];
 
 let players = JSON.parse(localStorage.getItem("shuttlemix_players") || "null") || defaultPlayers;
 // Migrate: ensure wins field exists
 players.forEach(p => { if (p.wins === undefined) p.wins = 0; if (p.points === undefined) p.points = 0; });
 let history = JSON.parse(localStorage.getItem("shuttlemix_history") || "[]");
+history.forEach(h => { if (h.closed === undefined) h.closed = false; });
+const MAX_COURTS = 4;
 let courtCount = (() => {
 const v = parseInt(localStorage.getItem("shuttlemix_court_count") || "1", 10);
-return v === 2 ? 2 : 1;
+return v >= 1 && v <= MAX_COURTS ? v : 1;
 })();
-let pendingByCourt = { 1: null, 2: null };
+let scoringStyle = localStorage.getItem("shuttlemix_scoring_style") === "league" ? "league" : "points";
+let matchmakingMode = localStorage.getItem("shuttlemix_matchmaking") === "mexicano" ? "mexicano" : "americano";
+const LEAGUE_WIN_PTS = 3;
+const LEAGUE_DRAW_PTS = 1;
+const SKILL_MIX_MAX = 2.5;
+const REPEAT_PARTNER_PENALTY = 8000;
+const REPEAT_OPPONENT_PENALTY = 4000;
+let pendingByCourt = { 1: null, 2: null, 3: null, 4: null };
+const courtRerollSeen = { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() };
+
+function clearCourtsAbove(n) {
+for (let c = n + 1; c <= MAX_COURTS; c++) {
+pendingByCourt[c] = null;
+courtRerollSeen[c].clear();
+}
+}
+
+function getMexicanoBandForCourt(courtNum) {
+const bands = {
+"1-1": { center: 0.5, halfWidth: 0.5 },
+"2-1": { center: 0.25, halfWidth: 0.38 },
+"2-2": { center: 0.75, halfWidth: 0.38 },
+"3-1": { center: 0.17, halfWidth: 0.32 },
+"3-2": { center: 0.5, halfWidth: 0.36 },
+"3-3": { center: 0.83, halfWidth: 0.32 },
+"4-1": { center: 0.12, halfWidth: 0.26 },
+"4-2": { center: 0.32, halfWidth: 0.26 },
+"4-3": { center: 0.68, halfWidth: 0.26 },
+"4-4": { center: 0.88, halfWidth: 0.26 }
+};
+return bands[`${courtCount}-${courtNum}`] || bands["1-1"];
+}
+
+function playerRankRatio(idx, n) {
+if (n <= 1) return 0.5;
+return idx / (n - 1);
+}
+
+function gpAllowedOnCourt(rankRatio, courtNum) {
+if (courtCount === 1) return true;
+if (courtCount === 2) {
+if (courtNum === 1 && rankRatio > 0.7) return false;
+if (courtNum === 2 && rankRatio < 0.3) return false;
+return true;
+}
+if (courtCount === 3) {
+if (courtNum === 1 && rankRatio > 0.58) return false;
+if (courtNum === 3 && rankRatio < 0.42) return false;
+return true;
+}
+if (courtNum === 1 && rankRatio > 0.52) return false;
+if (courtNum === 2 && rankRatio > 0.62) return false;
+if (courtNum === 3 && rankRatio < 0.38) return false;
+if (courtNum === 4 && rankRatio < 0.48) return false;
+return true;
+}
+const MAX_PRIORITY_PLAYERS = 4;
 let editingId = null; // track which player is being edited
 
 const seenPairings = new Set(JSON.parse(localStorage.getItem("shuttlemix_seen") || "[]"));
@@ -583,12 +975,276 @@ localStorage.setItem("shuttlemix_players", JSON.stringify(players));
 localStorage.setItem("shuttlemix_history", JSON.stringify(history));
 localStorage.setItem("shuttlemix_seen", JSON.stringify(Array.from(seenPairings)));
 localStorage.setItem("shuttlemix_court_count", String(courtCount));
+localStorage.setItem("shuttlemix_scoring_style", scoringStyle);
+localStorage.setItem("shuttlemix_matchmaking", matchmakingMode);
 };
+
+function applyScoreCredits(h, undo) {
+const a = h.scoreA;
+const b = h.scoreB;
+const m = undo ? -1 : 1;
+if (a === b) {
+if (scoringStyle === "league") {
+[...h.pairAIds, ...h.pairBIds].forEach(id => {
+const p = byId(id);
+if (p) p.points += m * LEAGUE_DRAW_PTS;
+});
+} else {
+h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points += m * a; });
+h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points += m * b; });
+}
+return;
+}
+const winIds = a > b ? h.pairAIds : h.pairBIds;
+if (scoringStyle === "league") {
+winIds.forEach(id => {
+const p = byId(id);
+if (p) {
+p.wins += m;
+p.points += m * LEAGUE_WIN_PTS;
+}
+});
+} else {
+winIds.forEach(id => { const p = byId(id); if (p) p.wins += m; });
+h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points += m * a; });
+h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points += m * b; });
+}
+}
+
+function undoScoreCredits(h) {
+if (h.scoreA === null) return;
+applyScoreCredits(h, true);
+}
+
+function recomputeStatsFromHistory() {
+players.forEach(p => { p.wins = 0; p.points = 0; });
+history.filter(h => h.scoreA !== null).forEach(h => applyScoreCredits(h, false));
+}
+
+function setScoringStyle(style) {
+const next = style === "league" ? "league" : "points";
+if (next === scoringStyle) return;
+scoringStyle = next;
+recomputeStatsFromHistory();
+save();
+renderLeaderboard();
+renderPlayers();
+}
 
 function pairKey(idsA, idsB) {
 const a = idsA.slice().sort().join("-");
 const b = idsB.slice().sort().join("-");
 return [a, b].sort().join("|");
+}
+
+function comparePlayerRank(a, b) {
+if (b.points !== a.points) return b.points - a.points;
+if (b.wins !== a.wins) return b.wins - a.wins;
+if (a.matches !== b.matches) return a.matches - b.matches;
+return b.skill - a.skill;
+}
+
+function rankActivePlayers(active) {
+return [...active].sort(comparePlayerRank);
+}
+
+function ensureMatchmakingStatsFresh() {
+if (matchmakingMode === "mexicano") recomputeStatsFromHistory();
+}
+
+function getLeaderboardRankMap() {
+const ranked = [...players].filter(p => !p.skip).sort(comparePlayerRank);
+const map = new Map();
+ranked.forEach((p, i) => map.set(p.id, i + 1));
+return map;
+}
+
+function attachRankSnapshot(match) {
+if (!match || match.error) return match;
+const rankByPlayerId = {};
+getLeaderboardRankMap().forEach((rank, id) => { rankByPlayerId[id] = rank; });
+return { ...match, rankByPlayerId };
+}
+
+function formatPairNames(names) {
+return names.join(" · ");
+}
+
+function playerLineLabel(p, rankByPlayerId) {
+const rank = rankByPlayerId && rankByPlayerId[p.id];
+const prefix = rank ? `#${rank} ` : "";
+if (matchmakingMode === "mexicano") return `${prefix}${p.name} (${p.points} pts)`;
+return `${prefix}${p.name} (${p.skill.toFixed(1)})`;
+}
+
+function pairAvgLabel(a, b) {
+if (matchmakingMode === "mexicano") {
+const avg = (a.points + b.points) / 2;
+return `Avg ${avg.toFixed(0)} pts`;
+}
+const avg = (a.skill + b.skill) / 2;
+return `Avg ${avg.toFixed(2)}`;
+}
+
+function buildMexicanoPool(active, courtNum) {
+const sorted = rankActivePlayers(active);
+const n = sorted.length;
+if (n <= 4) return sorted;
+const band = getMexicanoBandForCourt(courtNum);
+const centerIdx = Math.round((n - 1) * band.center);
+const halfIdx = Math.max(2, Math.ceil((n - 1) * band.halfWidth));
+const lo = Math.max(0, centerIdx - halfIdx);
+const hi = Math.min(n - 1, centerIdx + halfIdx);
+const mid = Math.ceil(n / 2);
+const minGp = Math.min(...active.map(p => p.matches));
+const byGp = [...active].sort((a, b) => a.matches - b.matches || comparePlayerRank(a, b));
+const poolMap = new Map();
+const add = (p) => poolMap.set(p.id, p);
+const rankIdx = (p) => sorted.findIndex(x => x.id === p.id);
+if (courtCount === 1) {
+byGp.slice(0, Math.min(n, 12)).forEach(add);
+sorted.slice(Math.max(0, mid - 3), Math.min(n, mid + 3)).forEach(add);
+active.forEach(p => { if (poolMap.size < Math.min(n, 10)) add(p); });
+return [...poolMap.values()];
+}
+byGp.filter(p => p.matches <= minGp + 1).forEach(p => {
+const idx = rankIdx(p);
+if (!gpAllowedOnCourt(playerRankRatio(idx, n), courtNum)) return;
+add(p);
+});
+sorted.slice(lo, hi + 1).forEach(add);
+if (courtCount >= 3) sorted.slice(Math.max(0, mid - 3), Math.min(n, mid + 3)).forEach(add);
+byGp.forEach(p => {
+if (poolMap.size >= Math.min(12, n)) return;
+const idx = rankIdx(p);
+const r = playerRankRatio(idx, n);
+if (!gpAllowedOnCourt(r, courtNum) && p.matches > minGp + 1) return;
+add(p);
+});
+active.forEach(p => { if (poolMap.size < Math.max(8, Math.min(n, 10))) add(p); });
+return [...poolMap.values()];
+}
+
+function mexicanoMatchBalancePenalty(a, b, everyone, priorities) {
+if (priorities.length && priorities.some(pr => everyone.some(p => p.id === pr.id))) return 0;
+const avgA = (a[0].points + a[1].points) / 2;
+const avgB = (b[0].points + b[1].points) / 2;
+const pairDelta = Math.abs(avgA - avgB);
+const byPts = [...everyone].sort((x, y) => x.points - y.points);
+const idealDelta = Math.abs((byPts[0].points + byPts[3].points) / 2 - (byPts[1].points + byPts[2].points) / 2);
+let pen = Math.max(0, pairDelta - idealDelta) * 1500;
+if (pairDelta > 10) pen += (pairDelta - 10) * 1200;
+const lowIds = new Set([byPts[0].id, byPts[1].id]);
+const stackWeak = (lowIds.has(a[0].id) && lowIds.has(a[1].id)) || (lowIds.has(b[0].id) && lowIds.has(b[1].id));
+if (stackWeak) pen += 20000;
+const highIds = new Set([byPts[2].id, byPts[3].id]);
+const stackStrong = (highIds.has(a[0].id) && highIds.has(a[1].id)) || (highIds.has(b[0].id) && highIds.has(b[1].id));
+if (stackStrong && stackWeak) pen += 8000;
+return pen;
+}
+
+function mexicanoQuartetPenalty(everyone, sorted, priorities) {
+if (priorities.length && priorities.some(pr => everyone.some(p => p.id === pr.id))) return 0;
+const pts = everyone.map(p => p.points);
+const ptsSpread = Math.max(...pts) - Math.min(...pts);
+let pen = 0;
+if (ptsSpread > 18) pen += (ptsSpread - 18) * 500;
+const n = sorted.length;
+const bottomStart = Math.floor((n * 2) / 3);
+const lowInMatch = everyone.filter(p => sorted.findIndex(x => x.id === p.id) >= bottomStart).length;
+if (lowInMatch >= 2) {
+const highsAvailable = sorted.slice(0, bottomStart).filter(p => !everyone.some(e => e.id === p.id));
+if (highsAvailable.length >= 2) pen += 6000;
+}
+return pen;
+}
+
+function mexicanoGpPenalty(everyone, active) {
+const minGp = Math.min(...active.map(p => p.matches));
+let pen = 0;
+everyone.forEach(p => {
+pen += Math.max(0, p.matches - minGp) * 1400;
+});
+const atMin = everyone.filter(p => p.matches === minGp).length;
+const availableAtMin = active.filter(p => p.matches === minGp).length;
+if (availableAtMin >= 1 && atMin < Math.min(4, availableAtMin)) {
+pen += (Math.min(4, availableAtMin) - atMin) * 3500;
+}
+return pen;
+}
+
+function mexicanoCourtFitPenalty(everyone, sorted, courtNum) {
+if (matchmakingMode !== "mexicano") return 0;
+const band = getMexicanoBandForCourt(courtNum);
+const n = sorted.length;
+let pen = 0;
+everyone.forEach(p => {
+const idx = sorted.findIndex(x => x.id === p.id);
+if (idx < 0) return;
+const r = playerRankRatio(idx, n);
+const dist = Math.abs(r - band.center);
+if (dist > band.halfWidth) pen += Math.floor((dist - band.halfWidth) * 4200);
+});
+return pen;
+}
+
+function getLastRoundRelations() {
+const lastPartner = {};
+const lastOpponents = {};
+const done = new Set();
+for (let i = history.length - 1; i >= 0; i--) {
+const h = history[i];
+if (!h.pairAIds || h.pairAIds.length < 2 || !h.pairBIds || h.pairBIds.length < 2) continue;
+[...h.pairAIds, ...h.pairBIds].forEach(id => {
+if (done.has(id)) return;
+done.add(id);
+if (h.pairAIds.includes(id)) {
+lastPartner[id] = h.pairAIds.find(x => x !== id);
+lastOpponents[id] = h.pairBIds.slice();
+} else {
+lastPartner[id] = h.pairBIds.find(x => x !== id);
+lastOpponents[id] = h.pairAIds.slice();
+}
+});
+}
+return { lastPartner, lastOpponents };
+}
+
+function socialRepeatPenalty(a, b, relations) {
+const { lastPartner, lastOpponents } = relations;
+let pen = 0;
+const partnerRepeat = (p1, p2) => {
+if (lastPartner[p1.id] === p2.id) pen += REPEAT_PARTNER_PENALTY;
+};
+partnerRepeat(a[0], a[1]);
+partnerRepeat(b[0], b[1]);
+const markOpponents = (team, otherTeam) => {
+team.forEach(p => {
+(otherTeam || []).forEach(o => {
+if (lastOpponents[p.id] && lastOpponents[p.id].includes(o.id)) pen += REPEAT_OPPONENT_PENALTY;
+});
+});
+};
+markOpponents(a, b);
+markOpponents(b, a);
+return pen;
+}
+
+function skillBalancePenalty(everyone, priorities) {
+if (priorities.length && priorities.some(pr => everyone.some(p => p.id === pr.id))) return 0;
+const skills = everyone.map(p => p.skill);
+const spread = Math.max(...skills) - Math.min(...skills);
+if (spread <= SKILL_MIX_MAX) return 0;
+return Math.floor((spread - SKILL_MIX_MAX) * 2500);
+}
+
+function buildAmericanoPool(active, priorities) {
+const high = Math.max(...active.map(p => p.matches));
+const fairnessPool = active.filter(p => p.matches >= high - 1);
+const lowPool = active.filter(p => p.matches <= high - 2);
+let pool = lowPool.length > 0 ? [...new Set([...lowPool, ...fairnessPool])] : active.slice();
+if (priorities.length) pool = [...new Set([...pool, ...priorities])];
+return pool;
 }
 
 function allLineups(pool) {
@@ -612,25 +1268,102 @@ out.push([splitA, splitB], [splitC, splitD], [splitE, splitF]);
 return out;
 }
 
+function isMatchLive(h) {
+return Boolean(h && h.scoreA === null && !h.closed);
+}
+
+function getLiveMatchForCourt(cn) {
+if (courtCount === 1) {
+return history.find(h => isMatchLive(h)) || null;
+}
+return history.find(h => isMatchLive(h) && h.court === cn) || null;
+}
+
+function courtNeedsLineup(cn) {
+if (pendingByCourt[cn]) return false;
+if (getLiveMatchForCourt(cn)) return false;
+return true;
+}
+
+function idsFromInProgressMatches(excludeCourt) {
+const ids = new Set();
+history.forEach(h => {
+if (!isMatchLive(h)) return;
+if (courtCount > 1 && excludeCourt != null && h.court === excludeCourt) return;
+[...h.pairAIds, ...h.pairBIds].forEach(id => ids.add(id));
+});
+return ids;
+}
+
+function buildExcludeIds(forCourt) {
+const ex = new Set(idsFromInProgressMatches(forCourt));
+for (let c = 1; c <= courtCount; c++) {
+if (c !== forCourt) idsFromPendingCourt(c).forEach(id => ex.add(id));
+}
+return ex;
+}
+
+function liveMatchToDisplay(h) {
+ensureMatchmakingStatsFresh();
+const a = h.pairAIds.map(id => byId(id)).filter(Boolean);
+const b = h.pairBIds.map(id => byId(id)).filter(Boolean);
+if (a.length !== 2 || b.length !== 2) return null;
+const isMex = matchmakingMode === "mexicano";
+const avgA = isMex ? (a[0].points + a[1].points) / 2 : (a[0].skill + a[1].skill) / 2;
+const avgB = isMex ? (b[0].points + b[1].points) / 2 : (b[0].skill + b[1].skill) / 2;
+const allSkills = [...a, ...b].map(p => p.skill);
+const allPts = [...a, ...b].map(p => p.points);
+const rankByPlayerId = {};
+getLeaderboardRankMap().forEach((rank, id) => { rankByPlayerId[id] = rank; });
+return {
+a, b, avgA, avgB,
+spread: Math.max(...allSkills) - Math.min(...allSkills),
+ptsSpread: Math.max(...allPts) - Math.min(...allPts),
+pairDelta: h.pairDelta ?? Math.abs(avgA - avgB),
+fairnessGap: 0,
+repeated: Boolean(h.repeated),
+live: true,
+rankByPlayerId
+};
+}
+
 function chooseMatch(opts) {
 const ex = opts && opts.excludeIds instanceof Set ? opts.excludeIds : new Set((opts && opts.excludeIds) || []);
+const avoidKeys = opts && opts.avoidKeys instanceof Set ? opts.avoidKeys : new Set();
+const courtNum = opts && typeof opts.courtNum === "number" ? opts.courtNum : 1;
 const active = players.filter(p => !p.skip && !ex.has(p.id));
-if (active.length < 4) return { error: "Need at least 4 available active players (not skipped, and not already on the other court’s lineup)." };
+if (active.length < 4) return { error: "Need at least 4 available active players (not skipped, not on another court, and not in a match still in progress)." };
 const priorities = active.filter(p => p.priority);
-const high = Math.max(...active.map(p => p.matches));
-const fairnessPool = active.filter(p => p.matches >= high - 1);
-const lowPool = active.filter(p => p.matches <= high - 2);
-let candidatePool = lowPool.length > 0 ? [...new Set([...lowPool, ...fairnessPool])] : active;
-if (priorities.length) {
-candidatePool = [...new Set([...candidatePool, ...priorities])];
+if (priorities.length > MAX_PRIORITY_PLAYERS) {
+return { error: `At most ${MAX_PRIORITY_PLAYERS} priority players can be active at once.` };
+}
+if (priorities.length === 4) {
+const missing = priorities.filter(pr => ex.has(pr.id));
+if (missing.length) return { error: "All 4 priority players must be available — someone is on another court or still playing." };
+}
+const sortedActive = rankActivePlayers(active);
+let candidatePool;
+if (priorities.length === 4) {
+candidatePool = priorities.slice();
+} else if (matchmakingMode === "mexicano") {
+candidatePool = buildMexicanoPool(active, courtNum);
+if (priorities.length) candidatePool = [...new Map([...candidatePool, ...priorities].map(p => [p.id, p])).values()];
+if (candidatePool.length < 4) candidatePool = active.slice();
+} else {
+candidatePool = buildAmericanoPool(active, priorities);
 }
 const lineups = allLineups(candidatePool);
 if (!lineups.length) return { error: "No valid lineup found." };
-let best = null;
-for (let maxGap = 2; maxGap <= active.length && !best; maxGap++) {
+const relations = getLastRoundRelations();
+const candidates = [];
+const isMex = matchmakingMode === "mexicano";
+const maxGapStart = isMex ? 0 : 2;
+const maxGapEnd = isMex ? 2 : active.length;
+const fairnessWeight = isMex ? 12000 : 1000;
+for (let maxGap = maxGapStart; maxGap <= maxGapEnd; maxGap++) {
 for (const [a, b] of lineups) {
 const everyone = [...a, ...b];
-if (priorities.length && !priorities.some(pr => everyone.some(p => p.id === pr.id))) continue;
+if (priorities.length && !priorities.every(pr => everyone.some(p => p.id === pr.id))) continue;
 const projected = players.map(p => ({ ...p }));
 for (const p of everyone) {
 const o = projected.find(x => x.id === p.id);
@@ -641,22 +1374,49 @@ const maxGames = Math.max(...activeProjected.map(p => p.matches));
 const minGames = Math.min(...activeProjected.map(p => p.matches));
 const fairnessGap = maxGames - minGames;
 if (fairnessGap > maxGap) continue;
+const gpSpread = Math.max(...everyone.map(p => p.matches)) - Math.min(...everyone.map(p => p.matches));
 const allSkills = everyone.map(p => p.skill);
 const spread = Math.max(...allSkills) - Math.min(...allSkills);
-const avgA = (a[0].skill + a[1].skill) / 2;
-const avgB = (b[0].skill + b[1].skill) / 2;
+const allPts = everyone.map(p => p.points);
+const ptsSpread = Math.max(...allPts) - Math.min(...allPts);
+const avgA = isMex ? (a[0].points + a[1].points) / 2 : (a[0].skill + a[1].skill) / 2;
+const avgB = isMex ? (b[0].points + b[1].points) / 2 : (b[0].skill + b[1].skill) / 2;
 const pairDelta = Math.abs(avgA - avgB);
 const key = pairKey(a.map(p => p.id), b.map(p => p.id));
 const repeated = seenPairings.has(key) ? 1 : 0;
-const priorityBoost = priorities.length ? (everyone.some(p => p.priority) ? 0 : 100) : 0;
-const score = fairnessGap * 1000 + priorityBoost + spread * 30 + pairDelta * 20 + repeated * 200;
-if (!best || score < best.score) {
-best = { a, b, avgA, avgB, spread, pairDelta, fairnessGap, repeated, key, score };
+const score =
+fairnessGap * fairnessWeight +
+(isMex
+? mexicanoGpPenalty(everyone, active) +
+gpSpread * 1800 +
+mexicanoQuartetPenalty(everyone, sortedActive, priorities) +
+mexicanoMatchBalancePenalty(a, b, everyone, priorities) +
+mexicanoCourtFitPenalty(everyone, sortedActive, courtNum)
+: 0) +
+socialRepeatPenalty(a, b, relations) +
+skillBalancePenalty(everyone, priorities) +
+spread * (isMex ? 8 : 30) +
+pairDelta * (isMex ? 350 : 20) +
+repeated * 200;
+candidates.push({ a, b, avgA, avgB, spread, ptsSpread, pairDelta, fairnessGap, repeated, key, score });
 }
+if (candidates.length) break;
 }
+if (!candidates.length) return { error: "No valid lineup found. Add more players or adjust skip toggles." };
+let pool = candidates.filter(c => !avoidKeys.has(c.key));
+let cycleReset = false;
+if (!pool.length) {
+pool = candidates;
+cycleReset = true;
+if (opts && typeof opts.onCycleReset === "function") opts.onCycleReset();
 }
-if (!best) return { error: "No valid lineup found. Add more players or adjust skip toggles." };
-return best;
+if (cycleReset) {
+const pick = pool[Math.floor(Math.random() * pool.length)];
+return { ...pick, cycleReset: true };
+}
+pool.sort((x, y) => x.score - y.score);
+const tieBand = pool.filter(c => c.score === pool[0].score);
+return tieBand[Math.floor(Math.random() * tieBand.length)];
 }
 
 function idsFromPendingCourt(c) {
@@ -665,13 +1425,30 @@ if (!m) return new Set();
 return new Set([...m.a, ...m.b].map(p => p.id));
 }
 
+function setMatchmakingMode(mode) {
+const next = mode === "mexicano" ? "mexicano" : "americano";
+if (next === matchmakingMode) return;
+matchmakingMode = next;
+save();
+updateMatchToolbar();
+}
+
 function updateMatchToolbar() {
 const hint = document.getElementById("matchCourtHint");
 if (hint) {
 hint.textContent = courtCount === 1
-? "One match at a time — all active players (except skipped) can be drawn."
-: "Two courts use eight different players: Court 2 is chosen only from players not on Court 1. Confirm each court when that game actually starts.";
+? "When a match is in progress, use Finish this match on the card to free players — with or without a score."
+: "Generate fills only open courts. Finish in-progress matches on each card; players stay reserved until you finish that game.";
 }
+const formatHint = document.getElementById("matchFormatHint");
+if (formatHint) {
+formatHint.textContent = matchmakingMode === "mexicano"
+? `Mexicano: ${courtCount === 1 ? "Balanced draws by rank and games played." : courtCount === 2 ? "Court 1 → top half, Court 2 → bottom half (flexible)." : courtCount === 3 ? "Court 1 → top, Court 2 → middle, Court 3 → bottom." : "Courts 1–2 → top half, Courts 3–4 → bottom half; middle ranks can land on any court."} GP stays even. Shows #rank and points.`
+: "Americano: balanced random draws by games played and skill. Priority players (max 4) are always included. Avoids the same partner or opponent back-to-back.";
+}
+document.querySelectorAll(".format-segment").forEach(btn => {
+btn.classList.toggle("active", btn.dataset.matchmaking === matchmakingMode);
+});
 const conf = document.getElementById("confirmBtn");
 const rer = document.getElementById("rerollBtn");
 if (conf) conf.style.display = courtCount === 1 ? "" : "none";
@@ -680,52 +1457,137 @@ document.querySelectorAll(".court-segment").forEach(btn => {
 btn.classList.toggle("active", Number(btn.dataset.setCourts) === courtCount);
 });
 const gen = document.getElementById("generateBtn");
-if (gen) gen.textContent = courtCount === 1 ? "Generate Next Match" : "Generate lineups";
+if (gen) {
+if (courtCount === 1) gen.textContent = "Generate Next Match";
+else {
+const n = [];
+for (let cn = 1; cn <= courtCount; cn++) if (courtNeedsLineup(cn)) n.push(cn);
+if (!n.length) gen.textContent = "Generate lineups";
+else if (n.length === courtCount) gen.textContent = `Generate lineups (${courtCount} courts)`;
+else gen.textContent = `Generate lineup (${n.length} open)`;
+}
+}
 }
 
 function matchTagsHtml(m) {
-return `<div style="margin-top:8px;">
+const isMex = matchmakingMode === "mexicano";
+const spreadLabel = isMex ? "Pts spread" : "Skill spread";
+const spreadVal = isMex ? (m.ptsSpread ?? 0) : m.spread;
+const spreadGood = isMex ? spreadVal <= 8 : spreadVal <= 2.5;
+const deltaGood = isMex ? m.pairDelta <= 6 : m.pairDelta <= 0.8;
+const deltaFmt = isMex ? m.pairDelta.toFixed(0) : m.pairDelta.toFixed(2);
+return `<div class="match-tags">
 <span class="tag good">Games fairness gap: ${m.fairnessGap}</span>
-<span class="tag ${m.spread <= 2.5 ? "good" : "warn"}">Skill spread: ${m.spread.toFixed(2)}</span>
-<span class="tag ${m.pairDelta <= 0.8 ? "good" : "warn"}">Pair avg delta: ${m.pairDelta.toFixed(2)}</span>
+<span class="tag ${spreadGood ? "good" : "warn"}">${spreadLabel}: ${spreadVal.toFixed(isMex ? 0 : 2)}</span>
+<span class="tag ${deltaGood ? "good" : "warn"}">Pair avg delta: ${deltaFmt}${isMex ? " pts" : ""}</span>
 <span class="tag ${m.repeated ? "warn" : "good"}">${m.repeated ? "Repeat pairing used" : "Repeat pairing avoided"}</span>
 </div>`;
 }
 
+function pairSideHtml(team, ranks) {
+return `<div class="pair">
+<div class="pair-player">${playerLineLabel(team[0], ranks)}</div>
+<div class="pair-player">${playerLineLabel(team[1], ranks)}</div>
+<div class="pair-avg muted">${pairAvgLabel(team[0], team[1])}</div>
+</div>`;
+}
+
 function pairGridHtml(m) {
+const ranks = m.rankByPlayerId || null;
 return `<div class="pair-grid">
-<div class="pair"><strong>Pair A</strong><br>${m.a[0].name} (${m.a[0].skill.toFixed(1)})<br>${m.a[1].name} (${m.a[1].skill.toFixed(1)})<br><span class="muted">Avg ${m.avgA.toFixed(2)}</span></div>
-<div><strong>VS</strong></div>
-<div class="pair"><strong>Pair B</strong><br>${m.b[0].name} (${m.b[0].skill.toFixed(1)})<br>${m.b[1].name} (${m.b[1].skill.toFixed(1)})<br><span class="muted">Avg ${m.avgB.toFixed(2)}</span></div>
+${pairSideHtml(m.a, ranks)}
+<div class="pair-vs" aria-hidden="true">VS</div>
+${pairSideHtml(m.b, ranks)}
 </div>
 ${matchTagsHtml(m)}`;
 }
 
+function endMatchPanelHtml(h) {
+const labelA = formatPairNames(h.pairA);
+const labelB = formatPairNames(h.pairB);
+return `<div class="end-match-panel">
+<div class="end-match-title">Finish this match</div>
+<p class="end-match-hint">Frees the court for new lineups. Enter scores below to update wins and points, or finish without a score.</p>
+<div class="end-match-scores">
+<div class="end-score-stack">
+<div class="end-score-row">
+<span class="end-score-names">${labelA}</span>
+<input type="number" min="0" id="msa-${h.id}" placeholder="0" aria-label="Score for ${labelA}" />
+</div>
+<div class="end-score-vs" aria-hidden="true">VS</div>
+<div class="end-score-row">
+<span class="end-score-names">${labelB}</span>
+<input type="number" min="0" id="msb-${h.id}" placeholder="0" aria-label="Score for ${labelB}" />
+</div>
+</div>
+</div>
+<div class="end-match-actions">
+<button type="button" class="primary small end-save-score-btn" data-hid="${h.id}">Finish &amp; save score</button>
+<button type="button" class="secondary small end-no-score-btn" data-hid="${h.id}">Finish without score</button>
+</div>
+</div>`;
+}
+
+function finishMatchWithScore(histId) {
+const h = history.find(x => x.id === histId);
+if (!h || !isMatchLive(h)) return alert("This match is no longer in progress.");
+const saEl = document.getElementById(`msa-${histId}`);
+const sbEl = document.getElementById(`msb-${histId}`);
+const sa = saEl?.value?.trim() ?? "";
+const sb = sbEl?.value?.trim() ?? "";
+if (sa === "" || sb === "") {
+return alert("Enter both scores, or use “Finish without score”.");
+}
+saveScore(histId, sa, sb);
+}
+
+function finishMatchWithoutScore(histId) {
+const h = history.find(x => x.id === histId);
+if (!h || !isMatchLive(h)) return alert("This match is no longer in progress.");
+h.closed = true;
+save();
+renderMatch();
+renderHistory();
+renderLeaderboard();
+renderStats();
+}
+
 function doGenerateMatches() {
+ensureMatchmakingStatsFresh();
 if (courtCount === 1) {
-const pick = chooseMatch({ excludeIds: new Set() });
+if (getLiveMatchForCourt(1)) {
+return alert("A match is still in progress. Finish it on the Match tab (with or without a score) before generating the next lineup.");
+}
+if (pendingByCourt[1]) {
+return alert("A lineup is already shown. Confirm start, reroll, or wait until the current match is scored.");
+}
+const pick = chooseMatch({ excludeIds: new Set(), courtNum: 1 });
 if (pick.error) return alert(pick.error);
-pendingByCourt[1] = pick;
-pendingByCourt[2] = null;
+courtRerollSeen[1].clear();
+pendingByCourt[1] = attachRankSnapshot(pick);
+clearCourtsAbove(1);
 renderMatch();
 updateMatchToolbar();
 document.querySelector('[data-view="matchView"]')?.click();
 return;
 }
-if (pendingByCourt[1] && pendingByCourt[2]) {
-return alert("Both courts already have lineups. Confirm a match to record GP, or use “Reroll this court” on a card to change it.");
+const openCourts = [];
+for (let cn = 1; cn <= courtCount; cn++) if (courtNeedsLineup(cn)) openCourts.push(cn);
+if (!openCourts.length) {
+return alert("All courts are busy. Finish in-progress matches or confirm/reroll pending lineups.");
 }
-if (!pendingByCourt[1]) {
-const pick = chooseMatch({ excludeIds: idsFromPendingCourt(2) });
-if (pick.error) return alert(pick.error);
-pendingByCourt[1] = pick;
+const reserved = new Set();
+history.forEach(h => { if (isMatchLive(h)) [...h.pairAIds, ...h.pairBIds].forEach(id => reserved.add(id)); });
+for (let cn = 1; cn <= courtCount; cn++) idsFromPendingCourt(cn).forEach(id => reserved.add(id));
+const freePlayers = players.filter(p => !p.skip && !reserved.has(p.id)).length;
+if (freePlayers < openCourts.length * 4) {
+return alert(`Need at least ${openCourts.length * 4} available players for ${openCourts.length} open court(s) (${freePlayers} available).`);
 }
-if (!pendingByCourt[2]) {
-const pick2 = chooseMatch({ excludeIds: idsFromPendingCourt(1) });
-if (pick2.error) {
-return alert("Could not fill Court 2: " + pick2.error + " You need at least eight active players (not skipped) split across both courts, or confirm Court 1 first to free players.");
-}
-pendingByCourt[2] = pick2;
+for (const cn of openCourts) {
+const pick = chooseMatch({ excludeIds: buildExcludeIds(cn), courtNum: cn });
+if (pick.error) return alert(`Court ${cn}: ${pick.error}`);
+courtRerollSeen[cn].clear();
+pendingByCourt[cn] = attachRankSnapshot(pick);
 }
 renderMatch();
 updateMatchToolbar();
@@ -752,9 +1614,11 @@ pairDelta: m.pairDelta,
 repeated: Boolean(m.repeated),
 scoreA: null,
 scoreB: null,
-court: courtCount === 2 ? courtNum : null
+closed: false,
+court: courtCount > 1 ? courtNum : null
 });
 pendingByCourt[courtNum] = null;
+courtRerollSeen[courtNum].clear();
 save();
 renderPlayers();
 renderMatch();
@@ -763,12 +1627,18 @@ renderLeaderboard();
 }
 
 function doRerollCourt(courtNum) {
+ensureMatchmakingStatsFresh();
 const m = pendingByCourt[courtNum];
-if (m) seenPairings.add(m.key);
-const other = courtNum === 1 ? 2 : 1;
-const pick = chooseMatch({ excludeIds: idsFromPendingCourt(other) });
+if (!m) return alert("No lineup to reroll for that court.");
+if (m.key) courtRerollSeen[courtNum].add(m.key);
+const pick = chooseMatch({
+excludeIds: courtCount === 1 ? new Set() : buildExcludeIds(courtNum),
+courtNum,
+avoidKeys: courtRerollSeen[courtNum],
+onCycleReset: () => courtRerollSeen[courtNum].clear()
+});
 if (pick.error) return alert(pick.error);
-pendingByCourt[courtNum] = pick;
+pendingByCourt[courtNum] = attachRankSnapshot(pick);
 save();
 renderMatch();
 }
@@ -838,6 +1708,14 @@ document.querySelectorAll('[data-role="priority"]').forEach(el => {
 el.onchange = (e) => {
 const p = byId(e.target.dataset.id);
 if (!p) return;
+if (e.target.checked) {
+const count = players.filter(x => x.priority && !x.skip).length;
+if (!p.priority && count >= MAX_PRIORITY_PLAYERS) {
+alert(`At most ${MAX_PRIORITY_PLAYERS} players can be Priority at once (a full court). Clear another priority tag first.`);
+e.target.checked = false;
+return;
+}
+}
 p.priority = e.target.checked;
 if (p.priority) p.skip = false;
 renderPlayers();
@@ -899,28 +1777,52 @@ renderStats();
 }
 
 function renderMatch() {
+if (matchmakingMode === "mexicano") ensureMatchmakingStatsFresh();
 const box = document.getElementById("matchResult");
 if (courtCount === 1) {
+const live = getLiveMatchForCourt(1);
+if (live) {
+const disp = liveMatchToDisplay(live);
+box.innerHTML = `<div class="court-card court-live"><div class="court-card-head"><span>Court 1</span><span style="text-transform:none;font-weight:700;letter-spacing:0;font-size:12px;">In progress</span></div>
+${pairGridHtml(disp)}
+${endMatchPanelHtml(live)}</div>`;
+updateMatchToolbar();
+return;
+}
 if (!pendingByCourt[1]) {
 box.innerHTML = '<div class="muted">No match generated yet.</div>';
+updateMatchToolbar();
 return;
 }
 box.innerHTML = pairGridHtml(pendingByCourt[1]);
+updateMatchToolbar();
 return;
 }
-const blocks = [1, 2].map(cn => {
+const blocks = [];
+for (let cn = 1; cn <= courtCount; cn++) {
+const live = getLiveMatchForCourt(cn);
+if (live) {
+const disp = liveMatchToDisplay(live);
+blocks.push(`<div class="court-card court-live"><div class="court-card-head"><span>Court ${cn}</span><span style="text-transform:none;font-weight:700;letter-spacing:0;font-size:12px;">In progress</span></div>
+${pairGridHtml(disp)}
+${endMatchPanelHtml(live)}</div>`);
+continue;
+}
 const m = pendingByCourt[cn];
 if (!m) {
-return `<div class="court-card court-empty"><div class="court-card-head"><span>Court ${cn}</span></div><div class="muted" style="padding:4px 0 8px;line-height:1.45;">No lineup yet — <strong>Generate lineups</strong> fills empty courts (needs eight active players for both at once).</div></div>`;
+blocks.push(`<div class="court-card court-empty"><div class="court-card-head"><span>Court ${cn}</span><span class="muted" style="text-transform:none;font-weight:600;letter-spacing:0;font-size:12px;">Open</span></div><div class="muted" style="padding:4px 0 8px;line-height:1.45;">No lineup — <strong>Generate</strong> fills open courts only (four players each). Busy players on other courts are excluded.</div></div>`);
+continue;
 }
-return `<div class="court-card"><div class="court-card-head"><span>Court ${cn}</span><span class="muted" style="text-transform:none;font-weight:600;letter-spacing:0;font-size:12px;">Ready</span></div>
+blocks.push(`<div class="court-card"><div class="court-card-head"><span>Court ${cn}</span><span class="muted" style="text-transform:none;font-weight:600;letter-spacing:0;font-size:12px;">Ready</span></div>
 ${pairGridHtml(m)}
 <div class="court-card-actions">
 <button type="button" class="primary small confirm-court-btn" data-court="${cn}">Confirm start</button>
 <button type="button" class="secondary small reroll-court-btn" data-court="${cn}">Reroll this court</button>
-</div></div>`;
-}).join("");
-box.innerHTML = `<div class="courts-grid">${blocks}</div>`;
+</div></div>`);
+}
+const gridClass = courtCount === 1 ? "courts-grid courts-1" : "courts-grid";
+box.innerHTML = `<div class="${gridClass}">${blocks.join("")}</div>`;
+updateMatchToolbar();
 }
 
 function renderStats() {
@@ -952,8 +1854,7 @@ if (saveAllBtn) {
     toSave.forEach(({ hid, a, b }) => {
       const av = parseInt(a), bv = parseInt(b);
       if (isNaN(av) || isNaN(bv) || av < 0 || bv < 0) { errors.push(`Invalid score for match ${hid}`); return; }
-      if (av === bv) { const h = history.find(x => x.id === hid); errors.push(`Draw not allowed: ${h ? h.pairA.join("/") + " vs " + h.pairB.join("/") : hid}`); return; }
-      saveScore(hid, a, b);
+      if (!saveScore(hid, a, b)) return;
     });
     if (errors.length) alert("Some scores could not be saved:\n" + errors.join("\n"));
   };
@@ -969,46 +1870,42 @@ const h = history[idx];
 const p = byId(id);
 if (p) p.matches = Math.max(0, p.matches - 1);
 });
-// Undo score credits if scored
-if (h.scoreA !== null) {
-const prevWinIds = h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds;
-prevWinIds.forEach(id => { const p = byId(id); if (p) p.wins = Math.max(0, p.wins - 1); });
-h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreA); });
-h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreB); });
-}
+if (h.scoreA !== null) undoScoreCredits(h);
 history.splice(idx, 1);
 save();
 renderHistory();
 renderLeaderboard();
 renderPlayers();
 renderStats();
+renderMatch();
 }
 
-function saveScore(histId, scoreA, scoreB) {
+function saveScore(histId, scoreA, scoreB, opts) {
 const h = history.find(x => x.id === histId);
-if (!h) return;
+if (!h) return false;
 const a = parseInt(scoreA), b = parseInt(scoreB);
-if (isNaN(a) || isNaN(b) || a < 0 || b < 0) return alert("Enter valid scores (0 or more).");
-if (a === b) return alert("Scores can't be a draw — enter different values.");
-// Undo previous credits if re-scoring
-if (h.scoreA !== null) {
-const prevWinIds = h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds;
-prevWinIds.forEach(id => { const p = byId(id); if (p) p.wins = Math.max(0, p.wins - 1); });
-h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreA); });
-h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points = Math.max(0, p.points - h.scoreB); });
+if (isNaN(a) || isNaN(b) || a < 0 || b < 0) {
+alert("Enter valid scores (0 or more).");
+return false;
 }
+if (a === b && !(opts && opts.skipDrawConfirm)) {
+const ptsNote = scoringStyle === "league"
+? "Each player will earn 1 league point."
+: `Each player will earn ${a} point${a === 1 ? "" : "s"} (their pair's score).`;
+const ok = confirm(`This match is a draw (${a}–${b}).\n\n${ptsNote}\n\nSave this result?`);
+if (!ok) return false;
+}
+if (h.scoreA !== null) undoScoreCredits(h);
 h.scoreA = a;
 h.scoreB = b;
-// Credit wins to winner pair
-const winIds = a > b ? h.pairAIds : h.pairBIds;
-winIds.forEach(id => { const p = byId(id); if (p) p.wins += 1; });
-// Credit points to all players based on their pair's score
-h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points += a; });
-h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points += b; });
+h.closed = false;
+applyScoreCredits(h, false);
 save();
 renderHistory();
 renderLeaderboard();
 renderPlayers();
+renderMatch();
+return true;
 }
 
 function renderHistory() {
@@ -1016,43 +1913,54 @@ const list = document.getElementById("historyList");
 list.innerHTML = "";
 [...history].reverse().forEach(h => {
 const hasScore = h.scoreA !== null;
+const endedNoScore = h.closed && !hasScore;
+const isDraw = hasScore && h.scoreA === h.scoreB;
 const aWon = hasScore && h.scoreA > h.scoreB;
 const item = document.createElement("div");
 item.className = "history-item";
 
+const teamA = formatPairNames(h.pairA);
+const teamB = formatPairNames(h.pairB);
+
 const scoreDisplay = hasScore
 ? `<span class="history-score-display">
-<span class="${aWon ? "winner" : "loser"}">${h.scoreA}</span>
-<span style="color:#b0b8d4;font-weight:400;font-size:14px"> – </span>
-<span class="${!aWon ? "winner" : "loser"}">${h.scoreB}</span>
+<span class="${isDraw ? "" : aWon ? "winner" : "loser"}">${h.scoreA}</span><span class="hist-score-sep">–</span><span class="${isDraw ? "" : !aWon ? "winner" : "loser"}">${h.scoreB}</span>
 </span>`
 : "";
 
 const winBadges = hasScore
-? `<span class="win-badge">${aWon ? h.pairA.join("/") : h.pairB.join("/")} won</span>`
+? (isDraw
+? `<span class="draw-badge">Draw</span>`
+: `<span class="win-badge">${formatPairNames(aWon ? h.pairA : h.pairB)} won</span>`)
 : "";
 
+const teamAClass = hasScore && !isDraw && aWon ? "hist-team-a hist-team-winner" : "hist-team-a";
+const teamBClass = hasScore && !isDraw && !aWon ? "hist-team-b hist-team-winner" : "hist-team-b";
+
 item.innerHTML = `
-<div class="history-main">
+<div class="history-top">
 <div class="history-matchup">
-<span style="color:#4f6fff">${h.pairA.join(" / ")}</span>
-<span style="color:#b0b8d4;margin:0 5px">vs</span>
-<span style="color:#5f6d94">${h.pairB.join(" / ")}</span>
+<span class="${teamAClass}">${teamA}</span>
+<span class="hist-vs">vs</span>
+<span class="${teamBClass}">${teamB}</span>
 </div>
 ${scoreDisplay}
-<span class="tag ${h.repeated ? "warn" : "good"}" style="white-space:nowrap">${h.repeated ? "Repeat" : "Unique"}</span>
+</div>
+<div class="history-meta">
+<span class="tag ${h.repeated ? "warn" : "good"}">${h.repeated ? "Repeat" : "Unique"}</span>
+${endedNoScore ? `<span class="tag warn">Ended · no score</span>` : ""}
 ${winBadges}
-${h.court ? `<span class="tag" style="white-space:nowrap;background:#e8eeff;color:#4f6fff;border:1px solid #c8d5fb;">Court ${h.court}</span>` : ""}
-<span style="color:#b0b8d4;font-size:12px;white-space:nowrap">${h.time}</span>
-${hasScore ? `<button class="score-edit-btn" data-hid="${h.id}">Edit match</button>` : ""}
+${h.court ? `<span class="tag hist-court-tag">Court ${h.court}</span>` : ""}
+<span class="hist-time">${h.time}</span>
+${hasScore ? `<button class="score-edit-btn" data-hid="${h.id}">Edit</button>` : ""}
 </div>
 <div class="score-entry" id="se-${h.id}" style="${hasScore ? "display:none" : ""}">
-<span class="pair-label">${h.pairA.join("/")}</span>
+<span class="pair-label">${teamA}</span>
 <input type="number" min="0" id="sa-${h.id}" value="${h.scoreA ?? ""}" placeholder="0" />
 <span class="sep">–</span>
 <input type="number" min="0" id="sb-${h.id}" value="${h.scoreB ?? ""}" placeholder="0" />
-<span class="pair-label">${h.pairB.join("/")}</span>
-<button class="score-save-btn" data-hid="${h.id}">Save score</button>
+<span class="pair-label">${teamB}</span>
+<button class="score-save-btn" data-hid="${h.id}">Save</button>
 <button class="hist-del-btn" data-hid="${h.id}" title="Delete this match">Del</button>
 </div>
 `;
@@ -1304,8 +2212,18 @@ list.innerHTML = facts.map(f => `
 }
 
 function renderLeaderboard() {
+document.querySelectorAll(".ranking-style-segment").forEach(btn => {
+btn.classList.toggle("active", btn.dataset.scoringStyle === scoringStyle);
+});
+const helpPoints = document.getElementById("rankingsHelpPoints");
+const helpLeague = document.getElementById("rankingsHelpLeague");
+if (helpPoints && helpLeague) {
+const league = scoringStyle === "league";
+helpPoints.style.display = league ? "none" : "flex";
+helpLeague.style.display = league ? "flex" : "none";
+}
 const box = document.getElementById("leaderboardTable");
-if (!players.length) { box.innerHTML = '<div class="muted">No players yet.</div>'; return; }
+if (!players.length) { box.innerHTML = '<div class="muted">No players yet.</div>'; renderFunFacts(); return; }
 const ranked = [...players].sort((a, b) => {
 if (b.points !== a.points) return b.points - a.points;
 if (b.wins !== a.wins) return b.wins - a.wins;
@@ -1314,6 +2232,7 @@ return a.skill - b.skill;
 });
 const medals = ["🥇", "🥈", "🥉"];
 const rankClasses = ["top1", "top2", "top3"];
+const ptsHeader = scoringStyle === "league" ? "League pts" : "Points";
 let rows = ranked.map((p, i) => {
 const rankDisplay = i < 3 ? medals[i] : (i + 1);
 const rankClass = i < 3 ? rankClasses[i] : "";
@@ -1331,7 +2250,7 @@ box.innerHTML = `<table class="lb-table">
 <th>Name</th>
 <th class="right">GP</th>
 <th class="right">Won</th>
-<th class="right">Points</th>
+<th class="right">${ptsHeader}</th>
 </tr></thead>
 <tbody>${rows}</tbody>
 </table>`;
@@ -1362,7 +2281,8 @@ players = JSON.parse(JSON.stringify(defaultPlayers));
 history = [];
 editingId = null;
 seenPairings.clear();
-pendingByCourt = { 1: null, 2: null };
+pendingByCourt = { 1: null, 2: null, 3: null, 4: null };
+for (let c = 1; c <= MAX_COURTS; c++) courtRerollSeen[c].clear();
 // Reset toolbar state too
 const toolbar = document.getElementById("toolbar");
 const addBtn = document.getElementById("addPlayerBtn");
@@ -1382,13 +2302,7 @@ doGenerateMatches();
 };
 
 document.getElementById("rerollBtn").onclick = () => {
-if (pendingByCourt[1]) seenPairings.add(pendingByCourt[1].key);
-const pick = chooseMatch({ excludeIds: new Set() });
-if (pick.error) return alert(pick.error);
-pendingByCourt[1] = pick;
-pendingByCourt[2] = null;
-save();
-renderMatch();
+doRerollCourt(1);
 };
 
 document.getElementById("confirmBtn").onclick = () => {
@@ -1413,6 +2327,16 @@ return;
 const cc = e.target.closest(".confirm-court-btn");
 if (cc) {
 doConfirmCourt(Number(cc.dataset.court));
+return;
+}
+const es = e.target.closest(".end-save-score-btn");
+if (es) {
+finishMatchWithScore(es.dataset.hid);
+return;
+}
+const en = e.target.closest(".end-no-score-btn");
+if (en) {
+finishMatchWithoutScore(en.dataset.hid);
 }
 });
 
@@ -1422,7 +2346,7 @@ const n = Number(btn.dataset.setCourts);
 if (n === courtCount) return;
 courtCount = n;
 localStorage.setItem("shuttlemix_court_count", String(n));
-if (courtCount === 1) pendingByCourt[2] = null;
+clearCourtsAbove(courtCount);
 updateMatchToolbar();
 renderMatch();
 save();
@@ -1430,6 +2354,16 @@ save();
 });
 
 updateMatchToolbar();
+
+document.querySelectorAll(".ranking-style-segment").forEach(btn => {
+btn.onclick = () => setScoringStyle(btn.dataset.scoringStyle);
+});
+
+document.querySelectorAll(".format-segment").forEach(btn => {
+btn.onclick = () => setMatchmakingMode(btn.dataset.matchmaking);
+});
+
+recomputeStatsFromHistory();
 
 renderPlayers();
 renderMatch();
