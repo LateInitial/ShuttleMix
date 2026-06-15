@@ -41,7 +41,7 @@ border: 1px solid #c8d5fb;
 box-shadow: 0 14px 32px rgba(49, 79, 157, 0.2);
 min-height: 650px;
 resize: both;
-overflow: hidden;
+overflow: visible;
 min-width: 320px;
 }
 .screen {
@@ -147,22 +147,13 @@ scrollbar-gutter: stable;
 /* Min width = sum of column mins + gaps; narrow viewports scroll horizontally instead of stretching tail cols. */
 .table-inner {
 width: 100%;
-min-width: 484px;
+min-width: 0;
 box-sizing: border-box;
 }
 /* Name uses 1fr so extra width goes to names; tail cols are fixed so Skip→Edit→Del spacing matches other gaps. */
 .header-row, .row {
 display: grid;
 width: 100%;
-grid-template-columns:
-32px
-minmax(105px, 1fr)
-44px
-38px
-74px
-50px
-63px
-55px;
 align-items: center;
 column-gap: 3px;
 row-gap: 0;
@@ -207,10 +198,10 @@ word-break: break-word;
 line-height: 1.375;
 font-size: inherit;
 }
-.skill { color: #4f6fff; font-weight: 700; font-variant-numeric: tabular-nums; }
+.skill { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
 .col-skill {
-text-align: left;
-justify-self: start;
+text-align: center;
+justify-self: center;
 }
 .col-games { text-align: center; justify-self: center; }
 .header-row > div:nth-child(1),
@@ -691,18 +682,9 @@ background: transparent;
 .top { padding-left: 12px; padding-right: 12px; }
 .view { padding: 8px 4px; }
 .card { padding: 8px 6px; border-radius: 12px; overflow: hidden; }
-.table-inner { min-width: 440px; width: 100%; box-sizing: border-box; }
+.table-inner { min-width: 0; width: 100%; box-sizing: border-box; }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 #playersView .header-row, #playersView .row {
-grid-template-columns:
-25px
-minmax(92px, 1fr)
-40px
-34px
-67px
-48px
-60px
-53px;
 align-items: center;
 column-gap: 3px;
 row-gap: 0;
@@ -753,6 +735,57 @@ font-size: 12px;
 .court-segment { padding: 7px 10px; font-size: 11px; }
 .format-segment, .ranking-style-segment { padding: 7px 12px; font-size: 12px; }
 }
+
+/* ===== Batch 1 additions ===== */
+.tabs { position: sticky; top: 0; z-index: 50; background: #eef4ff; }
+.table-inner.players-mode-normal .header-row,
+.table-inner.players-mode-normal .row {
+grid-template-columns: 24px minmax(74px,1fr) 34px 40px 30px 60px 44px;
+}
+.table-inner.players-mode-edit .header-row,
+.table-inner.players-mode-edit .row {
+grid-template-columns: 26px minmax(84px,1fr) 34px 44px 54px 46px;
+}
+.gender-toggle { display:inline-flex; border-radius:10px; background:#e8eeff; padding:3px; border:1px solid #cbd8ff; gap:2px; flex:0 0 auto; }
+.gender-seg { border:0; background:transparent; padding:7px 11px; border-radius:8px; font-weight:700; font-size:13px; color:#6f7ca3; cursor:pointer; }
+.gender-seg.active { background:#fff; color:#4f6fff; box-shadow:0 1px 3px rgba(79,111,255,0.18); }
+.col-mf { text-align:center; justify-self:center; font-variant-numeric:tabular-nums; }
+.gender-M { color:#4f6fff; }
+.gender-F { color:#d24d77; }
+.col-sort { cursor:pointer; user-select:none; }
+button#editModeBtn.active-edit { background:#4f6fff; }
+.row { min-height: 50px; }
+.state-box { width:22px; height:22px; border-radius:6px; border:1.5px solid #c2d0ff; background:#fff; cursor:pointer; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:13px; line-height:1; color:#6f7ca3; user-select:none; touch-action:none; }
+.state-box.on-priority { border-color:var(--ok-border); background:#e3f6ec; color:#1f8a52; }
+.state-box.on-skip { border-color:var(--skip-border); background:#fde7e9; color:#c0414a; }
+.state-box.locked { box-shadow:0 0 0 2px rgba(31,138,82,0.16); }
+.state-box.on-skip.locked { box-shadow:0 0 0 2px rgba(192,65,74,0.16); }
+.lb-table { table-layout: fixed; width: 100%; }
+.lb-table th, .lb-table td { padding-left: 7px; padding-right: 7px; }
+.lb-table th:nth-child(1), .lb-table td:nth-child(1) { width: 40px; text-align: center; }
+.lb-table th:nth-child(3), .lb-table td:nth-child(3) { width: 42px; }
+.lb-table th:nth-child(4), .lb-table td:nth-child(4) { width: 50px; }
+.lb-table th:nth-child(5), .lb-table td:nth-child(5) { width: 84px; white-space: nowrap; }
+.lb-table td:nth-child(2), .lb-table th:nth-child(2) { width: auto; white-space: normal; overflow-wrap: anywhere; }
+.lb-rank { width: auto; }
+.mode-chips { display:inline-flex; gap:3px; }
+.mode-chip { border:1px solid #c8d5fb; background:#eef3ff; color:#5f6d94; border-radius:8px; padding:3px 7px; font-size:11px; font-weight:700; cursor:pointer; text-transform:none; letter-spacing:0; }
+.mode-chip.active { background:#4f6fff; color:#fff; border-color:#4f6fff; }
+.court-status { text-transform:none; font-weight:600; letter-spacing:0; font-size:12px; color:#6a769f; }
+.slot-select { width:100%; border:1px solid #c2d0ff; background:#fff; border-radius:8px; padding:6px 6px; font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; font-family:inherit; cursor:pointer; box-sizing:border-box; }
+.slot-select.slot-empty { color:#8a94b0; border-style:dashed; background:#f8f9fc; }
+.pair-grid.editable .pair { gap:3px; }
+.ps-toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(12px); width:min(80vw, 600px); box-sizing:border-box; background:#fff; color:var(--text); border:1px solid #c8d5fb; border-left:4px solid var(--accent); border-radius:12px; padding:12px 16px; font-size:13.5px; line-height:1.45; box-shadow:0 8px 24px rgba(49,79,157,0.22); opacity:0; pointer-events:none; z-index:999; transition:opacity 0.3s ease, transform 0.3s ease; }
+.ps-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+/* Session name (Leaderboard) */
+.session-header { margin-bottom: 12px; }
+.session-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 5px; }
+.share-row { margin-top: 14px; }
+#shareLbBtn { font-size: 15px; padding: 10px 16px; }
+.session-name-input { width: 100%; box-sizing: border-box; border: 1px solid #cbd8ff; border-radius: 10px; padding: 9px 11px; font-size: 16px; font-weight: 700; color: var(--text); background: #fff; font-family: inherit; }
+.session-name-input::placeholder { font-weight: 600; color: #9aa6c8; }
+.session-date { margin-top: 5px; font-size: 13px; font-weight: 600; color: #4f6fff; }
+.session-hint { margin-top: 3px; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -773,17 +806,26 @@ font-size: 12px;
 <div class="toolbar-wrap">
 <div class="toolbar" id="toolbar">
 <input id="nameInput" class="name-input" placeholder="Player name" />
+<div class="gender-toggle" id="genderToggle" role="group" aria-label="Gender">
+<button type="button" class="gender-seg active" data-gender="M">M</button>
+<button type="button" class="gender-seg" data-gender="F">F</button>
+</div>
 <input id="skillInput" class="skill-input" type="number" min="1" max="10" step="0.1" placeholder="Skill" />
 <button id="addPlayerBtn" class="primary">Add Player</button>
-<button id="resetBtn" class="secondary">Reset Sample Data</button>
+<button id="resetBtn" class="secondary" style="display:none;">Reset Data</button>
+<button id="saveDefaultBtn" class="secondary" style="display:none;">Save as default</button>
+<button id="exportBtn" class="secondary" style="display:none;">Export</button>
+<button id="importBtn" class="secondary" style="display:none;">Import</button>
+<input type="file" id="importFile" accept="application/json,.json" style="display:none;" />
+<button id="editModeBtn" class="secondary">Edit</button>
 <span class="edit-mode-hint">✏️ Editing — update fields above &amp; press Save</span>
 </div>
 </div>
 </div>
 <div class="card">
 <div class="table-scroll">
-<div class="table-inner">
-<div class="header-row"><div>#</div><div>Name</div><div class="col-skill">Skill</div><div class="col-games">GP</div><div class="col-priority">Priority</div><div class="col-skip">Skip</div><div class="col-actions">Edit</div><div class="col-del">Del</div></div>
+<div class="table-inner" id="playersTableInner">
+<div id="playersHeader"></div>
 <div id="playersTable"></div>
 </div>
 </div>
@@ -829,16 +871,13 @@ font-size: 12px;
 </section>
 <section id="leaderboardView" class="view">
 <div class="card">
-<div class="lb-style-header">
-<div>
-<div class="muted" style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Ranking style</div>
-<div class="ranking-style-segments" role="group" aria-label="Ranking style">
-<button type="button" class="ranking-style-segment active" data-scoring-style="points">Points style</button>
-<button type="button" class="ranking-style-segment" data-scoring-style="league">League style</button>
-</div>
-</div>
+<div class="session-header">
+<input id="sessionNameInput" class="session-name-input" type="text" maxlength="60" placeholder="Session name (optional)" />
+<div class="session-date muted" id="sessionDateLabel"></div>
+<div class="session-hint">Optional. Shown on the leaderboard when you share or save it — leave blank to hide it.</div>
 </div>
 <div id="leaderboardTable"></div>
+<div class="share-row"><button id="shareLbBtn" class="primary" type="button">Share leaderboard</button></div>
 </div>
 <div class="card" id="funFactsCard" style="margin-top:0;display:none;">
 <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#6a769f;margin-bottom:10px;">✨ Did You Know?</div>
@@ -846,6 +885,12 @@ font-size: 12px;
 </div>
 <div class="card" style="margin-top:0;" id="rankingsHelpCard">
 <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#6a769f;margin-bottom:10px;">How rankings work</div>
+<div class="ranking-style-segments" role="group" aria-label="Ranking style" style="display:inline-flex;flex-wrap:wrap;margin-bottom:14px;">
+<button type="button" class="ranking-style-segment active" data-scoring-style="points">Points</button>
+<button type="button" class="ranking-style-segment" data-scoring-style="adjpts">Adj-Pts</button>
+<button type="button" class="ranking-style-segment" data-scoring-style="league">League</button>
+<button type="button" class="ranking-style-segment" data-scoring-style="ptspergp">Pts/GP</button>
+</div>
 <div id="rankingsHelpPoints" style="display:flex;flex-direction:column;gap:7px;">
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#fff4e0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#f5a623;flex-shrink:0;">1</span>
@@ -857,13 +902,41 @@ font-size: 12px;
 </div>
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
-<div><span style="font-weight:700;color:#1b2340;">Fewest Games Played</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player who achieved the same result in fewer games ranks higher. Efficiency matters.</span></div>
+<div><span style="font-weight:700;color:#1b2340;">Points difference</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? Your total score margin across all games (win 21–15 is +6, lose it is −6). A higher difference ranks higher.</span></div>
+</div>
+</div>
+<div id="rankingsHelpAdj" style="display:none;flex-direction:column;gap:7px;">
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#fff4e0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#f5a623;flex-shrink:0;">1</span>
+<div><span style="font-weight:700;color:#1b2340;">Adjusted points</span> <span style="color:#5f6d94;font-size:13px;">— Players who've played fewer games are topped up so totals are comparable. Each missing game is credited at the group's average points per game.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#e6f8ee;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#22a96e;flex-shrink:0;">2</span>
+<div><span style="font-weight:700;color:#1b2340;">The maths</span> <span style="color:#5f6d94;font-size:13px;">— Adjusted = your points + (most games anyone played − your games) × average points per game. A <strong>*</strong> marks anyone who got a top-up.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
+<div><span style="font-weight:700;color:#1b2340;">Tiebreakers</span> <span style="color:#5f6d94;font-size:13px;">— Equal adjusted points? More wins ranks higher, then points difference.</span></div>
+</div>
+</div>
+<div id="rankingsHelpPtsGp" style="display:none;flex-direction:column;gap:7px;">
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#fff4e0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#f5a623;flex-shrink:0;">1</span>
+<div><span style="font-weight:700;color:#1b2340;">Points per game</span> <span style="color:#5f6d94;font-size:13px;">— Your total points divided by games played, so the ranking stays fair even when people play different numbers of games.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#e6f8ee;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#22a96e;flex-shrink:0;">2</span>
+<div><span style="font-weight:700;color:#1b2340;">Wins</span> <span style="color:#5f6d94;font-size:13px;">— Equal points per game? The player with more wins ranks higher.</span></div>
+</div>
+<div style="display:flex;align-items:flex-start;gap:10px;">
+<span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
+<div><span style="font-weight:700;color:#1b2340;">Points difference</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player with the better total score margin ranks higher.</span></div>
 </div>
 </div>
 <div id="rankingsHelpLeague" style="display:none;flex-direction:column;gap:7px;">
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#fff4e0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#f5a623;flex-shrink:0;">1</span>
-<div><span style="font-weight:700;color:#1b2340;">League points</span> <span style="color:#5f6d94;font-size:13px;">— If your pair wins the match, each player on that pair earns <strong>3 points</strong>. The losing pair earns <strong>0</strong>. If the match ends in a draw, <strong>every player earns 1 point</strong>.</span></div>
+<div><span style="font-weight:700;color:#1b2340;">League points</span> <span style="color:#5f6d94;font-size:13px;">— If your pair wins the match, each player on that pair earns <strong>3 points</strong>. The losing pair earns <strong>1 point</strong> each.</span></div>
 </div>
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#e6f8ee;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#22a96e;flex-shrink:0;">2</span>
@@ -871,37 +944,38 @@ font-size: 12px;
 </div>
 <div style="display:flex;align-items:flex-start;gap:10px;">
 <span style="min-width:26px;height:26px;border-radius:8px;background:#eef3ff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#4f6fff;flex-shrink:0;">3</span>
-<div><span style="font-weight:700;color:#1b2340;">Fewest Games Played</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player who reached the same standing in fewer games ranks higher.</span></div>
+<div><span style="font-weight:700;color:#1b2340;">Points difference</span> <span style="color:#5f6d94;font-size:13px;">— Still tied? The player with the better total score margin ranks higher.</span></div>
 </div>
 </div>
 </div>
 </section>
 </div>
 </div>
+<div id="psToast" class="ps-toast" role="status" aria-live="polite"></div>
 <script>
 const defaultPlayers = [
-{ id: crypto.randomUUID(), name: "Joshua", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Julius", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Michael", skill: 7.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Nopi", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Open", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Michelle", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Sendy", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Rizky", skill: 8.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Connie", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Adi", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Angel", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Artyon", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Ucok", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Hengky", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Edbert", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Jeje", skill: 2.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
-{ id: crypto.randomUUID(), name: "Danny", skill: 3.0, matches: 0, wins: 0, points: 0, priority: false, skip: false }
+{ id: crypto.randomUUID(), name: "Joshua", gender: "M", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Julius", gender: "M", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Michael", gender: "M", skill: 7.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Nopi", gender: "F", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Open", gender: "M", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Michelle", gender: "F", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Sendy", gender: "F", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Rizky", gender: "M", skill: 8.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Connie", gender: "F", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Adi", gender: "M", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Angel", gender: "F", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Artyon", gender: "M", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Ucok", gender: "M", skill: 6.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Hengky", gender: "M", skill: 5.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Edbert", gender: "M", skill: 4.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Jeje", gender: "F", skill: 2.0, matches: 0, wins: 0, points: 0, priority: false, skip: false },
+{ id: crypto.randomUUID(), name: "Danny", gender: "M", skill: 3.0, matches: 0, wins: 0, points: 0, priority: false, skip: false }
 ];
 
 let players = JSON.parse(localStorage.getItem("shuttlemix_players") || "null") || defaultPlayers;
 // Migrate: ensure wins field exists
-players.forEach(p => { if (p.wins === undefined) p.wins = 0; if (p.points === undefined) p.points = 0; });
+players.forEach(p => { if (p.wins === undefined) p.wins = 0; if (p.points === undefined) p.points = 0; if (p.gender === undefined) p.gender = "M"; if (p.priorityLock === undefined) p.priorityLock = false; if (p.skipLock === undefined) p.skipLock = false; if (p.pointsDiff === undefined) p.pointsDiff = 0; });
 let history = JSON.parse(localStorage.getItem("shuttlemix_history") || "[]");
 history.forEach(h => { if (h.closed === undefined) h.closed = false; });
 const MAX_COURTS = 4;
@@ -909,19 +983,30 @@ let courtCount = (() => {
 const v = parseInt(localStorage.getItem("shuttlemix_court_count") || "1", 10);
 return v >= 1 && v <= MAX_COURTS ? v : 1;
 })();
-let scoringStyle = localStorage.getItem("shuttlemix_scoring_style") === "league" ? "league" : "points";
+let scoringStyle = (() => { const v = localStorage.getItem("shuttlemix_scoring_style"); return ["points","adjpts","league","ptspergp"].includes(v) ? v : "points"; })();
+const todayISO = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const fmtSessionDate = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); const d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(); return d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); };
+let sessionName = localStorage.getItem("shuttlemix_session_name") || "";
+let sessionDate = localStorage.getItem("shuttlemix_session_date") || "";
+if (!/^\d{4}-\d{2}-\d{2}$/.test(sessionDate)) { sessionDate = todayISO(); localStorage.setItem("shuttlemix_session_date", sessionDate); }
 let matchmakingMode = localStorage.getItem("shuttlemix_matchmaking") === "mexicano" ? "mexicano" : "americano";
 const LEAGUE_WIN_PTS = 3;
 const LEAGUE_DRAW_PTS = 1;
+const LEAGUE_LOSS_PTS = 1;
 const SKILL_MIX_MAX = 2.5;
 const REPEAT_PARTNER_PENALTY = 8000;
 const REPEAT_OPPONENT_PENALTY = 4000;
-let pendingByCourt = { 1: null, 2: null, 3: null, 4: null };
+let courtSlots = { 1:[null,null,null,null], 2:[null,null,null,null], 3:[null,null,null,null], 4:[null,null,null,null] };
+let courtSlotManual = { 1:[false,false,false,false], 2:[false,false,false,false], 3:[false,false,false,false], 4:[false,false,false,false] };
+let courtMode = (() => { try { const v = JSON.parse(localStorage.getItem("shuttlemix_court_modes") || "null"); return (v && typeof v === "object") ? {1:v[1]||"",2:v[2]||"",3:v[3]||"",4:v[4]||""} : {1:"",2:"",3:"",4:""}; } catch(e) { return {1:"",2:"",3:"",4:""}; } })();
 const courtRerollSeen = { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() };
+function saveCourts() { localStorage.setItem("shuttlemix_court_modes", JSON.stringify(courtMode)); }
 
 function clearCourtsAbove(n) {
 for (let c = n + 1; c <= MAX_COURTS; c++) {
-pendingByCourt[c] = null;
+courtSlots[c] = [null, null, null, null];
+courtSlotManual[c] = [false, false, false, false];
+courtMode[c] = "";
 courtRerollSeen[c].clear();
 }
 }
@@ -967,22 +1052,36 @@ return true;
 }
 const MAX_PRIORITY_PLAYERS = 4;
 let editingId = null; // track which player is being edited
+let editTableMode = false;
+let sortState = { col: null, dir: 1 };
+let selectedGender = "M";
+let customDefaults = JSON.parse(localStorage.getItem("shuttlemix_custom_defaults") || "null");
 
 const seenPairings = new Set(JSON.parse(localStorage.getItem("shuttlemix_seen") || "[]"));
 const byId = (id) => players.find(p => p.id === id);
+let _storageWarned = false;
 const save = () => {
+try {
 localStorage.setItem("shuttlemix_players", JSON.stringify(players));
 localStorage.setItem("shuttlemix_history", JSON.stringify(history));
 localStorage.setItem("shuttlemix_seen", JSON.stringify(Array.from(seenPairings)));
 localStorage.setItem("shuttlemix_court_count", String(courtCount));
 localStorage.setItem("shuttlemix_scoring_style", scoringStyle);
 localStorage.setItem("shuttlemix_matchmaking", matchmakingMode);
+localStorage.setItem("shuttlemix_session_name", sessionName);
+localStorage.setItem("shuttlemix_session_date", sessionDate);
+} catch (e) {
+if (!_storageWarned) { _storageWarned = true; alert("This browser is blocking local storage (e.g. Private Browsing), so changes can't be saved automatically. Use Edit \u25b8 Export to back up your data."); }
+}
 };
 
 function applyScoreCredits(h, undo) {
 const a = h.scoreA;
 const b = h.scoreB;
 const m = undo ? -1 : 1;
+// Points difference (score margin) — tracked the same way for every scoring style
+h.pairAIds.forEach(id => { const p = byId(id); if (p) p.pointsDiff += m * (a - b); });
+h.pairBIds.forEach(id => { const p = byId(id); if (p) p.pointsDiff += m * (b - a); });
 if (a === b) {
 if (scoringStyle === "league") {
 [...h.pairAIds, ...h.pairBIds].forEach(id => {
@@ -996,6 +1095,7 @@ h.pairBIds.forEach(id => { const p = byId(id); if (p) p.points += m * b; });
 return;
 }
 const winIds = a > b ? h.pairAIds : h.pairBIds;
+const loseIds = a > b ? h.pairBIds : h.pairAIds;
 if (scoringStyle === "league") {
 winIds.forEach(id => {
 const p = byId(id);
@@ -1004,6 +1104,7 @@ p.wins += m;
 p.points += m * LEAGUE_WIN_PTS;
 }
 });
+loseIds.forEach(id => { const p = byId(id); if (p) p.points += m * LEAGUE_LOSS_PTS; });
 } else {
 winIds.forEach(id => { const p = byId(id); if (p) p.wins += m; });
 h.pairAIds.forEach(id => { const p = byId(id); if (p) p.points += m * a; });
@@ -1017,12 +1118,12 @@ applyScoreCredits(h, true);
 }
 
 function recomputeStatsFromHistory() {
-players.forEach(p => { p.wins = 0; p.points = 0; });
+players.forEach(p => { p.wins = 0; p.points = 0; p.pointsDiff = 0; });
 history.filter(h => h.scoreA !== null).forEach(h => applyScoreCredits(h, false));
 }
 
 function setScoringStyle(style) {
-const next = style === "league" ? "league" : "points";
+const next = ["points","adjpts","league","ptspergp"].includes(style) ? style : "points";
 if (next === scoringStyle) return;
 scoringStyle = next;
 recomputeStatsFromHistory();
@@ -1073,8 +1174,9 @@ return names.join(" · ");
 function playerLineLabel(p, rankByPlayerId) {
 const rank = rankByPlayerId && rankByPlayerId[p.id];
 const prefix = rank ? `#${rank} ` : "";
-if (matchmakingMode === "mexicano") return `${prefix}${p.name} (${p.points} pts)`;
-return `${prefix}${p.name} (${p.skill.toFixed(1)})`;
+const g = (p.gender === "F") ? "F" : "M";
+const stat = matchmakingMode === "mexicano" ? `${p.points} pts` : p.skill.toFixed(1);
+return `${prefix}${p.name} · ${g} · ${stat} · ${p.matches} GP`;
 }
 
 function pairAvgLabel(a, b) {
@@ -1238,12 +1340,104 @@ if (spread <= SKILL_MIX_MAX) return 0;
 return Math.floor((spread - SKILL_MIX_MAX) * 2500);
 }
 
-function buildAmericanoPool(active, priorities) {
-const high = Math.max(...active.map(p => p.matches));
-const fairnessPool = active.filter(p => p.matches >= high - 1);
-const lowPool = active.filter(p => p.matches <= high - 2);
-let pool = lowPool.length > 0 ? [...new Set([...lowPool, ...fairnessPool])] : active.slice();
-if (priorities.length) pool = [...new Set([...pool, ...priorities])];
+// Fair teams must beat stacked teams (two weakest vs two strongest) every time.
+// Applies in BOTH formats and is NOT waived by priority (softened override).
+const ANTI_STACK_PENALTY = 60000;
+function antiStackPenalty(a, b) {
+const usePts = matchmakingMode === "mexicano";
+const val = (p) => usePts ? p.points : p.skill;
+const four = [...a, ...b].slice().sort((x, y) => val(x) - val(y));
+if (val(four[1]) === val(four[2])) return 0; // no clear low/high boundary
+const lowSet = new Set([four[0].id, four[1].id]);
+const aBothLow = lowSet.has(a[0].id) && lowSet.has(a[1].id);
+const bBothLow = lowSet.has(b[0].id) && lowSet.has(b[1].id);
+return (aBothLow || bBothLow) ? ANTI_STACK_PENALTY : 0;
+}
+
+// Americano: strongly favour including the least-played players (keep game counts level).
+function gpFairnessPenalty(everyone, active) {
+const minGp = Math.min(...active.map(p => p.matches));
+let pen = 0;
+everyone.forEach(p => { pen += Math.max(0, p.matches - minGp) * 1200; });
+return pen;
+}
+
+// Per player: how many of their games since they last CARRIED a low-high pairing (as the stronger half).
+function getLowHighRecency() {
+const LH_GAP = 3;
+const games = {};
+history.forEach(h => {
+if (!h.pairAIds || h.pairAIds.length < 2 || !h.pairBIds || h.pairBIds.length < 2) return;
+[h.pairAIds, h.pairBIds].forEach(team => {
+const p0 = byId(team[0]), p1 = byId(team[1]);
+let isLH = false, hiId = null;
+if (p0 && p1) { isLH = Math.abs(p0.skill - p1.skill) > LH_GAP; hiId = p0.skill >= p1.skill ? p0.id : p1.id; }
+team.forEach(id => { (games[id] = games[id] || []).push(isLH && id === hiId); });
+});
+});
+const gamesSince = (id) => {
+const arr = games[id];
+if (!arr || !arr.length) return Infinity;
+for (let i = arr.length - 1; i >= 0; i--) if (arr[i]) return (arr.length - 1) - i;
+return Infinity;
+};
+return { gamesSince };
+}
+
+// Prefer similar-skill partners; low-high teams only when needed, and don't make one strong
+// player carry low-high duty back-to-back (spread it across the strong players).
+function lowHighPenalty(a, b, lhInfo) {
+const T = 2, LH_GAP = 3, W_INTRA = 300;
+let pen = 0;
+[a, b].forEach(team => {
+const gap = Math.abs(team[0].skill - team[1].skill);
+pen += Math.max(0, gap - T) * W_INTRA;
+if (gap > LH_GAP) {
+const hi = team[0].skill >= team[1].skill ? team[0] : team[1];
+const k = lhInfo.gamesSince(hi.id);
+if (k <= 1) pen += 3000;
+else if (k === 2) pen += 800;
+}
+});
+return pen;
+}
+
+// Rounds are reconstructed from history: a new round starts when a court is reused.
+function getRotationInfo() {
+const valid = history.filter(h => h.pairAIds && h.pairAIds.length === 2 && h.pairBIds && h.pairBIds.length === 2);
+let curRound = 0; const used = new Set(); const roundOf = [];
+valid.forEach(h => { const court = h.court || 1; if (curRound === 0 || used.has(court)) { curRound++; used.clear(); } used.add(court); roundOf.push(curRound); });
+const currentRound = curRound;
+const playedSet = {}, lastRoundPlayed = {};
+valid.forEach((h, i) => { [...h.pairAIds, ...h.pairBIds].forEach(id => { (playedSet[id] = playedSet[id] || new Set()).add(roundOf[i]); lastRoundPlayed[id] = Math.max(lastRoundPlayed[id] || 0, roundOf[i]); }); });
+const lastRoundPlayers = new Set(); const lastPartner = {};
+valid.forEach((h, i) => { if (roundOf[i] !== currentRound) return; [...h.pairAIds, ...h.pairBIds].forEach(id => lastRoundPlayers.add(id)); lastPartner[h.pairAIds[0]] = h.pairAIds[1]; lastPartner[h.pairAIds[1]] = h.pairAIds[0]; lastPartner[h.pairBIds[0]] = h.pairBIds[1]; lastPartner[h.pairBIds[1]] = h.pairBIds[0]; });
+const trailing = (id) => { const set = playedSet[id]; if (!set) return 0; let c = 0, r = currentRound; while (set.has(r)) { c++; r--; } return c; };
+const restGap = (id) => (currentRound + 1) - (lastRoundPlayed[id] || 0);
+return { currentRound, lastRoundPlayers, lastPartner, trailing, restGap };
+}
+
+// Rest priority + carryover rules. Not waived for priority players (they're excluded from the carryover count instead).
+const REST_FULL_ROUNDS = 4, REST_WEIGHT = 1200;
+function rotationPenalty(everyone, rotation) {
+let pen = 0;
+everyone.forEach(p => { pen += Math.max(0, REST_FULL_ROUNDS - rotation.restGap(p.id)) * REST_WEIGHT; });
+const reps = everyone.filter(p => rotation.lastRoundPlayers.has(p.id) && !p.priority);
+if (reps.length === 2) pen += 4000;           // 2 carryovers: allowed, not preferred
+if (reps.length >= 3) pen += (reps.length - 1) * 12000; // 3+ carryovers: avoid
+for (let i = 0; i < reps.length; i++) for (let j = i + 1; j < reps.length; j++) {
+if (rotation.lastPartner[reps[i].id] === reps[j].id) pen += 200000; // both of a last-round pair: near-forbidden
+}
+return pen;
+}
+
+function buildAmericanoPool(active, priorities, rotation) {
+// Most-rested / least-played first, capped to bound the combination search on big groups.
+const AMERICANO_POOL_CAP = 14;
+const sorted = [...active].sort((a, b) =>
+(a.matches - b.matches) || (rotation.restGap(b.id) - rotation.restGap(a.id)) || (Math.random() - 0.5));
+let pool = sorted.slice(0, Math.min(active.length, AMERICANO_POOL_CAP));
+if (priorities.length) { const ids = new Set(pool.map(p => p.id)); priorities.forEach(pr => { if (!ids.has(pr.id)) pool.push(pr); }); }
 return pool;
 }
 
@@ -1280,7 +1474,7 @@ return history.find(h => isMatchLive(h) && h.court === cn) || null;
 }
 
 function courtNeedsLineup(cn) {
-if (pendingByCourt[cn]) return false;
+if (courtSlots[cn].some(Boolean)) return false;
 if (getLiveMatchForCourt(cn)) return false;
 return true;
 }
@@ -1331,8 +1525,27 @@ function chooseMatch(opts) {
 const ex = opts && opts.excludeIds instanceof Set ? opts.excludeIds : new Set((opts && opts.excludeIds) || []);
 const avoidKeys = opts && opts.avoidKeys instanceof Set ? opts.avoidKeys : new Set();
 const courtNum = opts && typeof opts.courtNum === "number" ? opts.courtNum : 1;
-const active = players.filter(p => !p.skip && !ex.has(p.id));
+let active = players.filter(p => !p.skip && !ex.has(p.id));
+const genderMode = opts && opts.genderMode ? opts.genderMode : "";
+if (genderMode === "MD") {
+active = active.filter(p => (p.gender || "M") === "M");
+if (active.length < 4) return { error: "Men's doubles (MD) needs at least 4 available male players." };
+} else if (genderMode === "WD") {
+active = active.filter(p => (p.gender || "M") === "F");
+if (active.length < 4) return { error: "Women's doubles (WD) needs at least 4 available female players." };
+} else if (genderMode === "XD") {
+const nm = active.filter(p => (p.gender || "M") === "M").length;
+const nf = active.filter(p => (p.gender || "M") === "F").length;
+if (nm < 2 || nf < 2) return { error: "Mixed doubles (XD) needs at least 2 male and 2 female available players." };
+}
 if (active.length < 4) return { error: "Need at least 4 available active players (not skipped, not on another court, and not in a match still in progress)." };
+const rotation = getRotationInfo();
+const lhInfo = getLowHighRecency();
+const blocked3 = active.filter(p => rotation.trailing(p.id) >= 2 && !p.priority);
+if (blocked3.length) {
+const elig = active.filter(p => !blocked3.includes(p));
+if (elig.length >= 4) active = elig; // never a 3rd straight round unless it drops us below 4
+}
 const priorities = active.filter(p => p.priority);
 if (priorities.length > MAX_PRIORITY_PLAYERS) {
 return { error: `At most ${MAX_PRIORITY_PLAYERS} priority players can be active at once.` };
@@ -1350,14 +1563,18 @@ candidatePool = buildMexicanoPool(active, courtNum);
 if (priorities.length) candidatePool = [...new Map([...candidatePool, ...priorities].map(p => [p.id, p])).values()];
 if (candidatePool.length < 4) candidatePool = active.slice();
 } else {
-candidatePool = buildAmericanoPool(active, priorities);
+candidatePool = buildAmericanoPool(active, priorities, rotation);
 }
-const lineups = allLineups(candidatePool);
-if (!lineups.length) return { error: "No valid lineup found." };
+let lineups = allLineups(candidatePool);
+if (genderMode === "XD") {
+const gg = (p) => (p.gender || "M");
+lineups = lineups.filter(([la, lb]) => gg(la[0]) !== gg(la[1]) && gg(lb[0]) !== gg(lb[1]));
+}
+if (!lineups.length) return { error: genderMode === "XD" ? "Couldn't form a mixed (XD) lineup from the available players." : "No valid lineup found." };
 const relations = getLastRoundRelations();
 const candidates = [];
 const isMex = matchmakingMode === "mexicano";
-const maxGapStart = isMex ? 0 : 2;
+const maxGapStart = isMex ? 0 : 3;
 const maxGapEnd = isMex ? 2 : active.length;
 const fairnessWeight = isMex ? 12000 : 1000;
 for (let maxGap = maxGapStart; maxGap <= maxGapEnd; maxGap++) {
@@ -1392,12 +1609,13 @@ gpSpread * 1800 +
 mexicanoQuartetPenalty(everyone, sortedActive, priorities) +
 mexicanoMatchBalancePenalty(a, b, everyone, priorities) +
 mexicanoCourtFitPenalty(everyone, sortedActive, courtNum)
-: 0) +
+: gpFairnessPenalty(everyone, active) + lowHighPenalty(a, b, lhInfo)) +
 socialRepeatPenalty(a, b, relations) +
-skillBalancePenalty(everyone, priorities) +
-spread * (isMex ? 8 : 30) +
-pairDelta * (isMex ? 350 : 20) +
-repeated * 200;
+antiStackPenalty(a, b) +
+rotationPenalty(everyone, rotation) +
+spread * (isMex ? 8 : 5) +
+pairDelta * (isMex ? 350 : 1400) +
+repeated * 1000000;
 candidates.push({ a, b, avgA, avgB, spread, ptsSpread, pairDelta, fairnessGap, repeated, key, score });
 }
 if (candidates.length) break;
@@ -1420,9 +1638,7 @@ return tieBand[Math.floor(Math.random() * tieBand.length)];
 }
 
 function idsFromPendingCourt(c) {
-const m = pendingByCourt[c];
-if (!m) return new Set();
-return new Set([...m.a, ...m.b].map(p => p.id));
+return new Set(courtSlots[c].filter(Boolean));
 }
 
 function setMatchmakingMode(mode) {
@@ -1436,9 +1652,7 @@ updateMatchToolbar();
 function updateMatchToolbar() {
 const hint = document.getElementById("matchCourtHint");
 if (hint) {
-hint.textContent = courtCount === 1
-? "When a match is in progress, use Finish this match on the card to free players — with or without a score."
-: "Generate fills only open courts. Finish in-progress matches on each card; players stay reserved until you finish that game.";
+hint.textContent = "Tap a player slot to add or swap. Generate fills empty courts; each court also has its own Generate/Reroll, Clear and Confirm. MD/WD/XD set a court to men\u2019s, women\u2019s or mixed doubles.";
 }
 const formatHint = document.getElementById("matchFormatHint");
 if (formatHint) {
@@ -1451,8 +1665,8 @@ btn.classList.toggle("active", btn.dataset.matchmaking === matchmakingMode);
 });
 const conf = document.getElementById("confirmBtn");
 const rer = document.getElementById("rerollBtn");
-if (conf) conf.style.display = courtCount === 1 ? "" : "none";
-if (rer) rer.style.display = courtCount === 1 ? "" : "none";
+if (conf) conf.style.display = "none";
+if (rer) rer.style.display = "none";
 document.querySelectorAll(".court-segment").forEach(btn => {
 btn.classList.toggle("active", Number(btn.dataset.setCourts) === courtCount);
 });
@@ -1506,8 +1720,6 @@ function endMatchPanelHtml(h) {
 const labelA = formatPairNames(h.pairA);
 const labelB = formatPairNames(h.pairB);
 return `<div class="end-match-panel">
-<div class="end-match-title">Finish this match</div>
-<p class="end-match-hint">Frees the court for new lineups. Enter scores below to update wins and points, or finish without a score.</p>
 <div class="end-match-scores">
 <div class="end-score-stack">
 <div class="end-score-row">
@@ -1554,40 +1766,15 @@ renderStats();
 
 function doGenerateMatches() {
 ensureMatchmakingStatsFresh();
-if (courtCount === 1) {
-if (getLiveMatchForCourt(1)) {
-return alert("A match is still in progress. Finish it on the Match tab (with or without a score) before generating the next lineup.");
+const targets = [];
+for (let cn = 1; cn <= courtCount; cn++) {
+if (getLiveMatchForCourt(cn)) continue;
+if (courtSlots[cn].some(x => !x)) targets.push(cn);
 }
-if (pendingByCourt[1]) {
-return alert("A lineup is already shown. Confirm start, reroll, or wait until the current match is scored.");
-}
-const pick = chooseMatch({ excludeIds: new Set(), courtNum: 1 });
-if (pick.error) return alert(pick.error);
-courtRerollSeen[1].clear();
-pendingByCourt[1] = attachRankSnapshot(pick);
-clearCourtsAbove(1);
-renderMatch();
-updateMatchToolbar();
-document.querySelector('[data-view="matchView"]')?.click();
-return;
-}
-const openCourts = [];
-for (let cn = 1; cn <= courtCount; cn++) if (courtNeedsLineup(cn)) openCourts.push(cn);
-if (!openCourts.length) {
-return alert("All courts are busy. Finish in-progress matches or confirm/reroll pending lineups.");
-}
-const reserved = new Set();
-history.forEach(h => { if (isMatchLive(h)) [...h.pairAIds, ...h.pairBIds].forEach(id => reserved.add(id)); });
-for (let cn = 1; cn <= courtCount; cn++) idsFromPendingCourt(cn).forEach(id => reserved.add(id));
-const freePlayers = players.filter(p => !p.skip && !reserved.has(p.id)).length;
-if (freePlayers < openCourts.length * 4) {
-return alert(`Need at least ${openCourts.length * 4} available players for ${openCourts.length} open court(s) (${freePlayers} available).`);
-}
-for (const cn of openCourts) {
-const pick = chooseMatch({ excludeIds: buildExcludeIds(cn), courtNum: cn });
-if (pick.error) return alert(`Court ${cn}: ${pick.error}`);
-courtRerollSeen[cn].clear();
-pendingByCourt[cn] = attachRankSnapshot(pick);
+if (!targets.length) return alert("No open slots to fill. Clear a court, or finish a match first.");
+for (const cn of targets) {
+const res = fillCourtAction(cn, false);
+if (res.error) { renderMatch(); updateMatchToolbar(); return alert(`Court ${cn}: ${res.error}`); }
 }
 renderMatch();
 updateMatchToolbar();
@@ -1595,30 +1782,41 @@ document.querySelector('[data-view="matchView"]')?.click();
 }
 
 function doConfirmCourt(courtNum) {
-const m = pendingByCourt[courtNum];
-if (!m) return alert("No match to confirm for that court.");
-const everyone = [...m.a, ...m.b];
-everyone.forEach(p => {
-const player = byId(p.id);
-if (player) player.matches += 1;
-});
-seenPairings.add(m.key);
+const ids = courtSlots[courtNum];
+if (ids.some(x => !x)) return alert("Fill all four slots before confirming this court.");
+const ps = ids.map(id => byId(id));
+if (ps.some(p => !p)) return alert("One of the players no longer exists \u2014 re-pick that slot.");
+const a = [ps[0], ps[1]], b = [ps[2], ps[3]];
+a.concat(b).forEach(p => { const pl = byId(p.id); if (pl) pl.matches += 1; });
+const key = pairKey([ids[0], ids[1]], [ids[2], ids[3]]);
+const repeated = seenPairings.has(key);
+seenPairings.add(key);
+const isMex = matchmakingMode === "mexicano";
+const avgA = isMex ? (a[0].points + a[1].points) / 2 : (a[0].skill + a[1].skill) / 2;
+const avgB = isMex ? (b[0].points + b[1].points) / 2 : (b[0].skill + b[1].skill) / 2;
 history.push({
 id: crypto.randomUUID(),
 time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-pairA: m.a.map(p => p.name),
-pairB: m.b.map(p => p.name),
-pairAIds: m.a.map(p => p.id),
-pairBIds: m.b.map(p => p.id),
-pairDelta: m.pairDelta,
-repeated: Boolean(m.repeated),
+pairA: a.map(p => p.name),
+pairB: b.map(p => p.name),
+pairAIds: a.map(p => p.id),
+pairBIds: b.map(p => p.id),
+pairDelta: Math.abs(avgA - avgB),
+repeated: repeated,
 scoreA: null,
 scoreB: null,
 closed: false,
 court: courtCount > 1 ? courtNum : null
 });
-pendingByCourt[courtNum] = null;
+courtSlots[courtNum] = [null, null, null, null];
+courtSlotManual[courtNum] = [false, false, false, false];
 courtRerollSeen[courtNum].clear();
+// One-game Priority/Skip expire once a game is confirmed; locked ones persist.
+players.forEach(pl => {
+if (pl.priority && !pl.priorityLock) pl.priority = false;
+if (pl.skip && !pl.skipLock) pl.skip = false;
+});
+saveCourts();
 save();
 renderPlayers();
 renderMatch();
@@ -1627,20 +1825,88 @@ renderLeaderboard();
 }
 
 function doRerollCourt(courtNum) {
-ensureMatchmakingStatsFresh();
-const m = pendingByCourt[courtNum];
-if (!m) return alert("No lineup to reroll for that court.");
-if (m.key) courtRerollSeen[courtNum].add(m.key);
-const pick = chooseMatch({
-excludeIds: courtCount === 1 ? new Set() : buildExcludeIds(courtNum),
-courtNum,
-avoidKeys: courtRerollSeen[courtNum],
-onCycleReset: () => courtRerollSeen[courtNum].clear()
-});
-if (pick.error) return alert(pick.error);
-pendingByCourt[courtNum] = attachRankSnapshot(pick);
-save();
+const full = courtSlots[courtNum].every(Boolean);
+const res = fillCourtAction(courtNum, full);
+if (res.error) return alert(`Court ${courtNum}: ${res.error}`);
+if (res.noop) return alert(res.noop);
 renderMatch();
+}
+
+function fillCourtAction(cn, reroll) {
+ensureMatchmakingStatsFresh();
+if (getLiveMatchForCourt(cn)) return { noop: "Finish the in-progress match on this court first." };
+const slots = courtSlots[cn], manual = courtSlotManual[cn];
+const toFill = [];
+for (let i = 0; i < 4; i++) { if (reroll ? !manual[i] : !slots[i]) toFill.push(i); }
+if (!toFill.length) return { noop: reroll ? "All four players are locked. Clear or change a slot to reroll." : "This court is already full." };
+const fixedPositions = [0, 1, 2, 3].filter(i => !toFill.includes(i) && slots[i]);
+if (!fixedPositions.length && toFill.length === 4) {
+if (slots.every(Boolean)) courtRerollSeen[cn].add(pairKey([slots[0], slots[1]], [slots[2], slots[3]]));
+const pick = chooseMatch({ excludeIds: buildExcludeIds(cn), courtNum: cn, genderMode: courtMode[cn] || "", avoidKeys: courtRerollSeen[cn], onCycleReset: () => courtRerollSeen[cn].clear() });
+if (pick.error) return { error: pick.error };
+courtSlots[cn] = [pick.a[0].id, pick.a[1].id, pick.b[0].id, pick.b[1].id];
+courtSlotManual[cn] = [false, false, false, false];
+saveCourts();
+return { ok: true };
+}
+const fill = constrainedFill(cn, toFill, fixedPositions);
+if (fill.error) return { error: fill.error };
+toFill.forEach((pos, idx) => { courtSlots[cn][pos] = fill.ids[idx]; courtSlotManual[cn][pos] = false; });
+saveCourts();
+return { ok: true };
+}
+
+function constrainedFill(cn, toFill, fixedPositions) {
+const slots = courtSlots[cn].slice();
+const fixedIds = fixedPositions.map(i => slots[i]);
+const ex = buildExcludeIds(cn);
+fixedIds.forEach(id => ex.add(id));
+let pool = players.filter(p => !p.skip && !ex.has(p.id));
+const mode = courtMode[cn] || "";
+if (mode === "MD") pool = pool.filter(p => (p.gender || "M") === "M");
+if (mode === "WD") pool = pool.filter(p => (p.gender || "M") === "F");
+if (pool.length < toFill.length) {
+return { error: mode === "MD" ? "Not enough available male players to fill this court." : mode === "WD" ? "Not enough available female players to fill this court." : "Not enough available players to fill the remaining slots." };
+}
+const rot = getRotationInfo();
+const lh = getLowHighRecency();
+const eligFill = pool.filter(p => rot.trailing(p.id) < 2);
+if (eligFill.length >= toFill.length) pool = eligFill;
+pool = [...pool].sort((a, b) => (rot.restGap(b.id) - rot.restGap(a.id)) || (a.matches - b.matches) || (Math.random() - 0.5)).slice(0, Math.min(pool.length, 12));
+const k = toFill.length;
+const combos = [];
+const rec = (pos, used, cur) => {
+if (combos.length > 20000) return;
+if (pos === k) { combos.push(cur.slice()); return; }
+for (const p of pool) { if (used.has(p.id)) continue; used.add(p.id); cur.push(p); rec(pos + 1, used, cur); cur.pop(); used.delete(p.id); }
+};
+rec(0, new Set(), []);
+const relations = getLastRoundRelations();
+const isMex = matchmakingMode === "mexicano";
+const gOf = (p) => (p.gender === "F") ? "F" : "M";
+let bestScore = Infinity, ties = [];
+for (const combo of combos) {
+const pos = slots.slice();
+toFill.forEach((i, idx) => { pos[i] = combo[idx].id; });
+const a = [byId(pos[0]), byId(pos[1])], b = [byId(pos[2]), byId(pos[3])];
+if (a.some(x => !x) || b.some(x => !x)) continue;
+if (mode === "XD" && !(gOf(a[0]) !== gOf(a[1]) && gOf(b[0]) !== gOf(b[1]))) continue;
+const everyone = [...a, ...b];
+const avgA = isMex ? (a[0].points + a[1].points) / 2 : (a[0].skill + a[1].skill) / 2;
+const avgB = isMex ? (b[0].points + b[1].points) / 2 : (b[0].skill + b[1].skill) / 2;
+const pairDelta = Math.abs(avgA - avgB);
+const sk = everyone.map(p => p.skill); const spread = Math.max(...sk) - Math.min(...sk);
+const pts = everyone.map(p => p.points); const ptsSpread = Math.max(...pts) - Math.min(...pts);
+const fillGP = combo.reduce((sum, p) => sum + p.matches, 0);
+const key = pairKey([pos[0], pos[1]], [pos[2], pos[3]]);
+const repeated = seenPairings.has(key) ? 1 : 0;
+const score = fillGP * 1200 + socialRepeatPenalty(a, b, relations) + antiStackPenalty(a, b) + rotationPenalty([...a, ...b], rot) + (isMex ? 0 : lowHighPenalty(a, b, lh)) + pairDelta * (isMex ? 350 : 1400) + (isMex ? ptsSpread * 8 : spread * 5) + repeated * 1000000;
+if (score < bestScore - 1e-9) { bestScore = score; ties = [combo]; }
+else if (Math.abs(score - bestScore) < 1e-9) { ties.push(combo); }
+}
+if (!ties.length) return { error: mode === "XD" ? "Couldn't form a mixed (XD) lineup with the players you've placed." : "No valid fill found for the remaining slots." };
+const chosen = ties[Math.floor(Math.random() * ties.length)];
+return { ids: chosen.map(p => p.id) };
 }
 
 function setEditMode(id) {
@@ -1654,6 +1920,7 @@ if (id) {
 const p = byId(id);
 nameInput.value = p.name;
 skillInput.value = p.skill;
+setGenderUI(p.gender || "M");
 nameInput.focus();
 toolbar.classList.add("editing-mode");
 addBtn.textContent = "Save Changes";
@@ -1662,6 +1929,7 @@ addBtn.classList.add("save-btn");
 } else {
 nameInput.value = "";
 skillInput.value = "";
+setGenderUI("M");
 toolbar.classList.remove("editing-mode");
 addBtn.textContent = "Add Player";
 addBtn.classList.add("primary");
@@ -1670,10 +1938,116 @@ addBtn.classList.remove("save-btn");
 renderPlayers();
 }
 
+
+function getDisplayPlayers() {
+if (!sortState.col) return players;
+const col = sortState.col, dir = sortState.dir;
+const copy = [...players];
+copy.sort((a, b) => {
+if (col === "name") { const av = a.name.toLowerCase(), bv = b.name.toLowerCase(); return av < bv ? -dir : av > bv ? dir : 0; }
+if (col === "gender") { const av = (a.gender || ""), bv = (b.gender || ""); return av < bv ? -dir : av > bv ? dir : 0; }
+if (col === "skill") return (a.skill - b.skill) * dir;
+if (col === "matches") return (a.matches - b.matches) * dir;
+return 0;
+});
+return copy;
+}
+
+function setGenderUI(g) {
+selectedGender = (g === "F") ? "F" : "M";
+document.querySelectorAll('#genderToggle .gender-seg').forEach(b => b.classList.toggle('active', b.dataset.gender === selectedGender));
+}
+
+function updateDefaultButtons() {
+["resetBtn", "saveDefaultBtn", "exportBtn", "importBtn"].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = editTableMode ? "" : "none"; });
+}
+
+function bindSortHandlers() {
+document.querySelectorAll('#playersHeader .col-sort').forEach(el => {
+el.onclick = () => {
+const col = el.dataset.sort;
+if (sortState.col === col) sortState.dir = -sortState.dir;
+else { sortState.col = col; sortState.dir = 1; }
+renderPlayers();
+};
+});
+}
+
+function showPsHintOnce() {
+if (localStorage.getItem("shuttlemix_ps_hint_seen")) return;
+localStorage.setItem("shuttlemix_ps_hint_seen", "1");
+const t = document.getElementById("psToast");
+if (!t) return;
+t.innerHTML = '<strong>Tip —</strong> a ✓ lasts for the next game only. Press &amp; hold the box to 🔒 lock a player until you clear it.';
+t.classList.add("show");
+clearTimeout(t._hideTimer);
+t._hideTimer = setTimeout(() => t.classList.remove("show"), 5000);
+}
+
+function stateBoxHtml(p, kind) {
+const on = kind === "priority" ? p.priority : p.skip;
+const locked = kind === "priority" ? p.priorityLock : p.skipLock;
+const cls = on ? (kind === "priority" ? "on-priority" : "on-skip") : "";
+const lk = (on && locked) ? " locked" : "";
+const icon = on ? (locked ? "🔒" : "✓") : "";
+const state = on ? (locked ? "locked" : "this game") : "off";
+return `<div class="toggle-wrap"><button type="button" class="state-box ${cls}${lk}" data-role="${kind}" data-id="${p.id}" aria-label="${kind} ${state} for ${p.name}" title="Tap: this game only · Long-press: lock (persists)">${icon}</button></div>`;
+}
+
+function setToggleState(p, kind, action) {
+showPsHintOnce();
+const onProp = kind;
+const lockProp = kind === "priority" ? "priorityLock" : "skipLock";
+const otherProp = kind === "priority" ? "skip" : "priority";
+const otherLockProp = kind === "priority" ? "skipLock" : "priorityLock";
+const turningOn = !p[onProp];
+if (kind === "priority" && turningOn) {
+const count = players.filter(x => x.priority && !x.skip).length;
+if (count >= MAX_PRIORITY_PLAYERS) {
+alert(`At most ${MAX_PRIORITY_PLAYERS} players can be Priority at once (a full court). Clear another priority tag first.`);
+return;
+}
+}
+if (action === "tap") {
+if (!p[onProp]) { p[onProp] = true; p[lockProp] = false; p[otherProp] = false; p[otherLockProp] = false; }
+else { p[onProp] = false; p[lockProp] = false; }
+} else {
+if (p[onProp] && p[lockProp]) { p[onProp] = false; p[lockProp] = false; }
+else { p[onProp] = true; p[lockProp] = true; p[otherProp] = false; p[otherLockProp] = false; }
+}
+renderPlayers();
+}
+
+function bindStateBoxes() {
+document.querySelectorAll('.state-box').forEach(box => {
+const id = box.dataset.id, kind = box.dataset.role;
+let held = false, timer = null;
+const start = (e) => { e.preventDefault(); held = false; timer = setTimeout(() => { held = true; timer = null; const p = byId(id); if (p) setToggleState(p, kind, "hold"); }, 450); };
+const end = () => { if (timer) { clearTimeout(timer); timer = null; if (!held) { const p = byId(id); if (p) setToggleState(p, kind, "tap"); } } };
+const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
+box.addEventListener("pointerdown", start);
+box.addEventListener("pointerup", end);
+box.addEventListener("pointerleave", cancel);
+box.addEventListener("pointercancel", cancel);
+box.addEventListener("contextmenu", (e) => { e.preventDefault(); const p = byId(id); if (p) setToggleState(p, kind, "hold"); });
+});
+}
+
 function renderPlayers() {
+const inner = document.getElementById("playersTableInner");
+const headerBox = document.getElementById("playersHeader");
 const table = document.getElementById("playersTable");
+inner.classList.toggle("players-mode-edit", editTableMode);
+inner.classList.toggle("players-mode-normal", !editTableMode);
+const arrow = (col) => sortState.col === col ? (sortState.dir === 1 ? " ▲" : " ▼") : "";
+if (editTableMode) {
+headerBox.innerHTML = `<div class="header-row"><div>#</div><div class="col-sort" data-sort="name">Name${arrow("name")}</div><div class="col-mf col-sort" data-sort="gender">M/F${arrow("gender")}</div><div class="col-skill col-sort" data-sort="skill">Skill${arrow("skill")}</div><div class="col-actions">Edit</div><div class="col-del">Del</div></div>`;
+} else {
+headerBox.innerHTML = `<div class="header-row"><div>#</div><div class="col-sort" data-sort="name">Name${arrow("name")}</div><div class="col-mf col-sort" data-sort="gender">M/F${arrow("gender")}</div><div class="col-skill col-sort" data-sort="skill">Skill${arrow("skill")}</div><div class="col-games col-sort" data-sort="matches">GP${arrow("matches")}</div><div class="col-priority">Priority</div><div class="col-skip">Skip</div></div>`;
+}
 table.innerHTML = "";
-players.forEach((p, idx) => {
+const list = getDisplayPlayers();
+list.forEach((p, idx) => {
 const isEditing = editingId === p.id;
 const row = document.createElement("div");
 let rowClass = "row";
@@ -1681,56 +2055,27 @@ if (isEditing) rowClass += " editing";
 else if (p.skip) rowClass += " skip";
 else if (p.priority) rowClass += " priority";
 row.className = rowClass;
-
+const g = (p.gender === "F") ? "F" : "M";
+const genderHtml = `<div class="col-mf gender-${g}">${g}</div>`;
+if (editTableMode) {
 const editHTML = isEditing
-  ? `<button class="small save-btn" data-role="save" data-id="${p.id}" title="Save changes">Save</button>`
-  : `<button class="small edit-btn" data-role="edit" data-id="${p.id}" title="Edit player">Edit</button>`;
+? `<button class="small save-btn" data-role="save" data-id="${p.id}" title="Save changes">Save</button>`
+: `<button class="small edit-btn" data-role="edit" data-id="${p.id}" title="Edit player">Edit</button>`;
 const delHTML = `<button class="small danger" data-role="delete" data-id="${p.id}" title="Delete player">Del</button>`;
-
-row.innerHTML = `
-<div>${idx + 1}</div>
-<div class="name">${p.name}</div>
-<div class="skill col-skill">${p.skill.toFixed(1)}</div>
-<div class="col-games">${p.matches}</div>
-<div class="toggle-wrap"><input type="checkbox" ${p.priority ? "checked" : ""} data-role="priority" data-id="${p.id}" ${p.skip ? "disabled" : ""}></div>
-<div class="toggle-wrap"><input type="checkbox" ${p.skip ? "checked" : ""} data-role="skip" data-id="${p.id}"></div>
-<div class="col-actions">${editHTML}</div>
-<div class="col-del">${delHTML}</div>
-`;
+row.innerHTML = `<div>${idx + 1}</div><div class="name">${p.name}</div>${genderHtml}<div class="skill col-skill">${p.skill.toFixed(1)}</div><div class="col-actions">${editHTML}</div><div class="col-del">${delHTML}</div>`;
+} else {
+row.innerHTML = `<div>${idx + 1}</div><div class="name">${p.name}</div>${genderHtml}<div class="skill col-skill">${p.skill.toFixed(1)}</div><div class="col-games">${p.matches}</div>${stateBoxHtml(p,"priority")}${stateBoxHtml(p,"skip")}`;
+}
 table.appendChild(row);
 });
 bindRowHandlers();
+bindSortHandlers();
+bindStateBoxes();
 save();
 }
 
 function bindRowHandlers() {
-document.querySelectorAll('[data-role="priority"]').forEach(el => {
-el.onchange = (e) => {
-const p = byId(e.target.dataset.id);
-if (!p) return;
-if (e.target.checked) {
-const count = players.filter(x => x.priority && !x.skip).length;
-if (!p.priority && count >= MAX_PRIORITY_PLAYERS) {
-alert(`At most ${MAX_PRIORITY_PLAYERS} players can be Priority at once (a full court). Clear another priority tag first.`);
-e.target.checked = false;
-return;
-}
-}
-p.priority = e.target.checked;
-if (p.priority) p.skip = false;
-renderPlayers();
-};
-});
-
-document.querySelectorAll('[data-role="skip"]').forEach(el => {
-el.onchange = (e) => {
-const p = byId(e.target.dataset.id);
-if (!p) return;
-p.skip = e.target.checked;
-if (p.skip) p.priority = false;
-renderPlayers();
-};
-});
+// Priority/Skip boxes are wired in bindStateBoxes() (tap = this game, long-press = lock)
 
 document.querySelectorAll('[data-role="edit"]').forEach(el => {
 el.onclick = (e) => {
@@ -1771,55 +2116,124 @@ const p = byId(editingId);
 if (p) {
 p.name = name;
 p.skill = skill;
+p.gender = selectedGender;
 }
 setEditMode(null);
 renderStats();
 }
 
-function renderMatch() {
-if (matchmakingMode === "mexicano") ensureMatchmakingStatsFresh();
-const box = document.getElementById("matchResult");
-if (courtCount === 1) {
-const live = getLiveMatchForCourt(1);
-if (live) {
-const disp = liveMatchToDisplay(live);
-box.innerHTML = `<div class="court-card court-live"><div class="court-card-head"><span>Court 1</span><span style="text-transform:none;font-weight:700;letter-spacing:0;font-size:12px;">In progress</span></div>
-${pairGridHtml(disp)}
-${endMatchPanelHtml(live)}</div>`;
-updateMatchToolbar();
-return;
+function optLabel(p, rankMap) {
+const g = (p.gender === "F") ? "F" : "M";
+const stat = matchmakingMode === "mexicano" ? `${p.points}pts` : p.skill.toFixed(1);
+const r = rankMap && rankMap.get(p.id);
+return `${r ? "#" + r + " " : ""}${p.name} \u00b7 ${g} \u00b7 ${stat} \u00b7 ${p.matches} GP`;
 }
-if (!pendingByCourt[1]) {
-box.innerHTML = '<div class="muted">No match generated yet.</div>';
-updateMatchToolbar();
-return;
+
+function eligibleForSlot(cn, slot) {
+const busy = new Set();
+history.forEach(h => { if (isMatchLive(h)) [...h.pairAIds, ...h.pairBIds].forEach(id => busy.add(id)); });
+for (let c = 1; c <= courtCount; c++) {
+courtSlots[c].forEach((id, i) => { if (id && !(c === cn && i === slot)) busy.add(id); });
 }
-box.innerHTML = pairGridHtml(pendingByCourt[1]);
-updateMatchToolbar();
-return;
+return players.filter(p => !p.skip && !busy.has(p.id));
 }
-const blocks = [];
-for (let cn = 1; cn <= courtCount; cn++) {
+
+function slotSelectHtml(cn, idx, rankMap) {
+const curId = courtSlots[cn][idx];
+const cur = curId ? byId(curId) : null;
+const elig = eligibleForSlot(cn, idx).filter(p => !cur || p.id !== cur.id).sort((a, b) => a.name.localeCompare(b.name));
+let opts = cur
+? `<option value="${cur.id}" selected>${optLabel(cur, rankMap)}</option>`
+: `<option value="" selected>+ Add player</option>`;
+elig.forEach(p => { opts += `<option value="${p.id}">${optLabel(p, rankMap)}</option>`; });
+if (cur) opts += `<option value="__remove__">\u2715 Remove</option>`;
+return `<select class="slot-select ${cur ? "" : "slot-empty"}" data-court="${cn}" data-slot="${idx}" aria-label="Court ${cn} player ${idx + 1}">${opts}</select>`;
+}
+
+function pairAvgFromSlots(cn, i, j) {
+const a = byId(courtSlots[cn][i]), b = byId(courtSlots[cn][j]);
+if (!a || !b) return "";
+return pairAvgLabel(a, b);
+}
+
+function slotsTagsHtml(cn) {
+const ids = courtSlots[cn];
+const a = [byId(ids[0]), byId(ids[1])], b = [byId(ids[2]), byId(ids[3])];
+if (a.some(x => !x) || b.some(x => !x)) return "";
+const isMex = matchmakingMode === "mexicano";
+const everyone = [...a, ...b];
+const avgA = isMex ? (a[0].points + a[1].points) / 2 : (a[0].skill + a[1].skill) / 2;
+const avgB = isMex ? (b[0].points + b[1].points) / 2 : (b[0].skill + b[1].skill) / 2;
+const allSkills = everyone.map(p => p.skill), allPts = everyone.map(p => p.points);
+const gpVals = everyone.map(p => p.matches);
+const key = pairKey([ids[0], ids[1]], [ids[2], ids[3]]);
+const m = { a, b, avgA, avgB, spread: Math.max(...allSkills) - Math.min(...allSkills), ptsSpread: Math.max(...allPts) - Math.min(...allPts), pairDelta: Math.abs(avgA - avgB), fairnessGap: Math.max(...gpVals) - Math.min(...gpVals), repeated: seenPairings.has(key) };
+return matchTagsHtml(m);
+}
+
+function courtModeChipsHtml(cn) {
+const mode = courtMode[cn] || "";
+const chip = (md) => `<button type="button" class="mode-chip ${mode === md ? "active" : ""}" data-court="${cn}" data-mode="${md}">${md}</button>`;
+return `<span class="mode-chips">${chip("MD")}${chip("WD")}${chip("XD")}</span>`;
+}
+
+function courtActionsHtml(cn, full, filledCount) {
+const confirmBtn = full ? `<button type="button" class="primary small court-confirm-btn" data-court="${cn}">Confirm start</button>` : "";
+const genBtn = `<button type="button" class="secondary small court-reroll-btn" data-court="${cn}">${full ? "Reroll" : "Generate"}</button>`;
+const clearBtn = filledCount > 0 ? `<button type="button" class="secondary small court-clear-btn" data-court="${cn}">Clear</button>` : "";
+return `${confirmBtn}${genBtn}${clearBtn}`;
+}
+
+function courtCardHtml(cn) {
 const live = getLiveMatchForCourt(cn);
 if (live) {
 const disp = liveMatchToDisplay(live);
-blocks.push(`<div class="court-card court-live"><div class="court-card-head"><span>Court ${cn}</span><span style="text-transform:none;font-weight:700;letter-spacing:0;font-size:12px;">In progress</span></div>
+return `<div class="court-card court-live"><div class="court-card-head"><span>Court ${cn}</span><span class="court-status">In progress</span></div>
 ${pairGridHtml(disp)}
-${endMatchPanelHtml(live)}</div>`);
-continue;
+${endMatchPanelHtml(live)}</div>`;
 }
-const m = pendingByCourt[cn];
-if (!m) {
-blocks.push(`<div class="court-card court-empty"><div class="court-card-head"><span>Court ${cn}</span><span class="muted" style="text-transform:none;font-weight:600;letter-spacing:0;font-size:12px;">Open</span></div><div class="muted" style="padding:4px 0 8px;line-height:1.45;">No lineup — <strong>Generate</strong> fills open courts only (four players each). Busy players on other courts are excluded.</div></div>`);
-continue;
+const slots = courtSlots[cn];
+const filledCount = slots.filter(Boolean).length;
+const full = filledCount === 4;
+const status = full ? "Ready" : (filledCount === 0 ? "Open" : "Filling\u2026");
+const rankMap = getLeaderboardRankMap();
+const sl = (idx) => slotSelectHtml(cn, idx, rankMap);
+return `<div class="court-card ${full ? "" : "court-empty"}">
+<div class="court-card-head"><span>Court ${cn}</span>${courtModeChipsHtml(cn)}<span class="court-status">${status}</span></div>
+<div class="pair-grid editable">
+<div class="pair">${sl(0)}${sl(1)}<div class="pair-avg muted">${pairAvgFromSlots(cn, 0, 1)}</div></div>
+<div class="pair-vs" aria-hidden="true">VS</div>
+<div class="pair">${sl(2)}${sl(3)}<div class="pair-avg muted">${pairAvgFromSlots(cn, 2, 3)}</div></div>
+</div>
+${full ? slotsTagsHtml(cn) : ""}
+<div class="court-card-actions">${courtActionsHtml(cn, full, filledCount)}</div>
+</div>`;
 }
-blocks.push(`<div class="court-card"><div class="court-card-head"><span>Court ${cn}</span><span class="muted" style="text-transform:none;font-weight:600;letter-spacing:0;font-size:12px;">Ready</span></div>
-${pairGridHtml(m)}
-<div class="court-card-actions">
-<button type="button" class="primary small confirm-court-btn" data-court="${cn}">Confirm start</button>
-<button type="button" class="secondary small reroll-court-btn" data-court="${cn}">Reroll this court</button>
-</div></div>`);
+
+function setSlotPlayer(cn, slot, val) {
+if (val === "__remove__" || val === "") {
+courtSlots[cn][slot] = null;
+courtSlotManual[cn][slot] = false;
+} else {
+for (let i = 0; i < 4; i++) { if (courtSlots[cn][i] === val) { courtSlots[cn][i] = null; courtSlotManual[cn][i] = false; } }
+courtSlots[cn][slot] = val;
+courtSlotManual[cn][slot] = true;
 }
+saveCourts();
+renderMatch();
+}
+
+function setCourtMode(cn, mode) {
+courtMode[cn] = (courtMode[cn] === mode) ? "" : mode;
+saveCourts();
+renderMatch();
+}
+
+function renderMatch() {
+if (matchmakingMode === "mexicano") ensureMatchmakingStatsFresh();
+const box = document.getElementById("matchResult");
+const blocks = [];
+for (let cn = 1; cn <= courtCount; cn++) blocks.push(courtCardHtml(cn));
 const gridClass = courtCount === 1 ? "courts-grid courts-1" : "courts-grid";
 box.innerHTML = `<div class="${gridClass}">${blocks.join("")}</div>`;
 updateMatchToolbar();
@@ -1836,7 +2250,9 @@ const least = [...players].sort((a,b) => a.matches - b.matches)[0];
 const avgDelta = history.length
 ? (history.reduce((acc, h) => acc + h.pairDelta, 0) / history.length).toFixed(2)
 : "n/a";
-stats.innerHTML = `<span>Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong></span><button id="saveAllBtn" class="small save-btn" title="Save all scores at once" style="margin-left:auto;padding:6px 12px;font-size:12px;">Save All</button>`;
+stats.innerHTML = `<span>Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong></span><span style="margin-left:auto;display:inline-flex;gap:8px;align-items:center;"><button id="histExportBtn" class="small secondary" title="Export a backup" style="padding:6px 12px;font-size:12px;">Export</button><button id="histImportBtn" class="small secondary" title="Import a backup" style="padding:6px 12px;font-size:12px;">Import</button><button id="saveAllBtn" class="small save-btn" title="Save all scores at once" style="padding:6px 12px;font-size:12px;">Save All</button></span>`;
+const histExp = document.getElementById("histExportBtn"); if (histExp) histExp.onclick = exportBackup;
+const histImp = document.getElementById("histImportBtn"); if (histImp) histImp.onclick = () => { const fi = document.getElementById("importFile"); if (fi) fi.click(); };
 const saveAllBtn = document.getElementById("saveAllBtn");
 if (saveAllBtn) {
   saveAllBtn.onclick = () => {
@@ -1999,202 +2415,107 @@ const facts = [];
 const scored = history.filter(h => h.scoreA !== null);
 if (!scored.length || players.length < 2) return facts;
 
-const margin = (matches) => {
-const total = matches.reduce((s, h) => s + Math.abs(h.scoreA - h.scoreB), 0);
-return total / matches.length;
-};
+const margin = (ms) => ms.reduce((s, h) => s + Math.abs(h.scoreA - h.scoreB), 0) / ms.length;
+const matchesOf = (id) => scored.filter(h => [...h.pairAIds, ...h.pairBIds].includes(id));
+const pushFact = (type, subjectIds, emoji, text, score = 50) => { facts.push({ type, subjectIds: [...new Set(subjectIds)].filter(Boolean), emoji, text, score }); };
+// Returns the single highest item by val(); null if the top value is tied (no clear winner).
+const uniqueTop = (arr, val) => { let best = null, bv = -Infinity, tie = false; arr.forEach(it => { const v = val(it); if (v > bv) { bv = v; best = it; tie = false; } else if (v === bv) { tie = true; } }); return tie ? null : best; };
 
-const pushFact = (type, subjectIds, emoji, text) => {
-const ids = [...new Set(subjectIds)].filter(Boolean);
-facts.push({ type, subjectIds: ids, emoji, text });
-};
+// CLOSE_SCORING — tightest average margin (unique)
+const tight = uniqueTop(players.filter(p => matchesOf(p.id).length >= 2).map(p => ({ p, avg: margin(matchesOf(p.id)) })).filter(c => c.avg <= 4), c => -c.avg);
+if (tight) pushFact("CLOSE_SCORING", [tight.p.id], "🎯", `<strong>${tight.p.name}</strong> lives on the edge — their matches have an average margin of just <strong>${tight.avg.toFixed(1)} points</strong>. Every rally counts!`, 55 + (5 - tight.avg) * 4);
 
-// 1. Tight average scoring margin (same trivia family as clutch wins below)
-players.forEach(p => {
-const pm = scored.filter(h => [...h.pairAIds, ...h.pairBIds].includes(p.id));
-if (pm.length >= 2) {
-const avg = margin(pm);
-if (avg <= 4) {
-pushFact("CLOSE_SCORING", [p.id], "🎯", `<strong>${p.name}</strong> lives on the edge — their matches have an average margin of just <strong>${avg.toFixed(1)} points</strong>. Every rally counts!`);
-}
-}
-});
-
-// 2. Dominant player — high win rate (min 2 games)
-players.forEach(p => {
-if (p.matches >= 2 && p.wins / p.matches >= 0.75) {
-const pct = Math.round((p.wins / p.matches) * 100);
-pushFact("HIGH_WIN_RATE", [p.id], "🔥", `<strong>${p.name}</strong> is on fire with a <strong>${pct}% win rate</strong> across ${p.matches} games. Unstoppable!`);
-}
-});
-
-// 3. Best duo — pair with 100% win rate (min 2 matches together)
-const pairStats = {};
-scored.forEach(h => {
-const aWon = h.scoreA > h.scoreB;
-const pairs = [
-{ ids: h.pairAIds.slice().sort(), won: aWon },
-{ ids: h.pairBIds.slice().sort(), won: !aWon }
-];
-pairs.forEach(({ ids, won }) => {
-const key = ids.join("|");
-if (!pairStats[key]) pairStats[key] = { ids, wins: 0, total: 0 };
-pairStats[key].total++;
-if (won) pairStats[key].wins++;
-});
-});
-Object.values(pairStats).forEach(ps => {
-if (ps.total >= 2 && ps.wins === ps.total && ps.ids.length === 2) {
-const names = ps.ids.map(id => byId(id)?.name).filter(Boolean);
-if (names.length === 2) pushFact("PERFECT_DUO", ps.ids, "🤝", `<strong>${names[0]}</strong> & <strong>${names[1]}</strong> are an unbeaten duo — <strong>${ps.wins} wins from ${ps.total} matches</strong> together. Chemistry unlocked!`);
-}
-});
-
-// 4. Clutch wins (narrow margins) — same trivia type as (1) so only one "close scoring" angle shows
+// CLOSE_SCORING — most clutch wins (unique)
 const comebacks = {};
-scored.forEach(h => {
-const aWon = h.scoreA > h.scoreB;
-const m = Math.abs(h.scoreA - h.scoreB);
-if (m <= 3) {
-const winIds = aWon ? h.pairAIds : h.pairBIds;
-winIds.forEach(id => {
-if (!comebacks[id]) comebacks[id] = 0;
-comebacks[id]++;
-});
-}
-});
-const topClutch = Object.entries(comebacks).sort((a,b) => b[1]-a[1])[0];
-if (topClutch && topClutch[1] >= 2) {
-const p = byId(topClutch[0]);
-if (p) pushFact("CLOSE_SCORING", [p.id], "💪", `<strong>${p.name}</strong> thrives under pressure — they've won <strong>${topClutch[1]} nail-biting matches</strong> decided by 3 points or fewer. Clutch player!`);
-}
+scored.forEach(h => { if (Math.abs(h.scoreA - h.scoreB) <= 3) (h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds).forEach(id => comebacks[id] = (comebacks[id] || 0) + 1); });
+const clutch = uniqueTop(Object.entries(comebacks).filter(([, c]) => c >= 2).map(([id, c]) => ({ id, c })), o => o.c);
+if (clutch) { const p = byId(clutch.id); if (p) pushFact("CLOSE_SCORING", [p.id], "💪", `<strong>${p.name}</strong> thrives under pressure — they've won <strong>${clutch.c} nail-biting matches</strong> decided by 3 points or fewer. Clutch player!`, 60 + clutch.c * 6); }
 
-// 5. Most unique partners
+// HIGH_WIN_RATE — unique highest
+const wr = uniqueTop(players.filter(p => p.matches >= 2 && p.wins / p.matches >= 0.75).map(p => ({ p, r: p.wins / p.matches })), c => c.r);
+if (wr) { const pct = Math.round(wr.r * 100); pushFact("HIGH_WIN_RATE", [wr.p.id], "🔥", `<strong>${wr.p.name}</strong> is on fire with a <strong>${pct}% win rate</strong> across ${wr.p.matches} games. Unstoppable!`, 50 + pct * 0.5 + wr.p.matches); }
+
+// PERFECT_DUO — unbeaten pair with unique most wins
+const pairStats = {};
+scored.forEach(h => { const aWon = h.scoreA > h.scoreB; [{ ids: h.pairAIds.slice().sort(), won: aWon }, { ids: h.pairBIds.slice().sort(), won: !aWon }].forEach(({ ids, won }) => { const k = ids.join("|"); (pairStats[k] = pairStats[k] || { ids, wins: 0, total: 0 }); pairStats[k].total++; if (won) pairStats[k].wins++; }); });
+const perfect = uniqueTop(Object.values(pairStats).filter(ps => ps.total >= 2 && ps.wins === ps.total && ps.ids.length === 2), ps => ps.wins);
+if (perfect) { const names = perfect.ids.map(id => byId(id)?.name).filter(Boolean); if (names.length === 2) pushFact("PERFECT_DUO", perfect.ids, "🤝", `<strong>${names[0]}</strong> & <strong>${names[1]}</strong> are an unbeaten duo — <strong>${perfect.wins} wins from ${perfect.total} matches</strong> together. Chemistry unlocked!`, 70 + perfect.wins * 6); }
+
+// PARTNER_DIVERSITY — unique most partners
 const teammates = {};
-scored.forEach(h => {
-const allPairs = [h.pairAIds, h.pairBIds];
-allPairs.forEach(pair => {
-if (pair.length === 2) {
-const [a, b] = pair;
-if (!teammates[a]) teammates[a] = new Set();
-if (!teammates[b]) teammates[b] = new Set();
-teammates[a].add(b);
-teammates[b].add(a);
-}
-});
-});
-let socialPlayer = { id: null, name: null, count: 0 };
-Object.entries(teammates).forEach(([id, set]) => {
-if (set.size > socialPlayer.count) socialPlayer = { id, name: byId(id)?.name, count: set.size };
-});
-if (socialPlayer.id && socialPlayer.count >= 3) {
-pushFact("PARTNER_DIVERSITY", [socialPlayer.id], "🌟", `<strong>${socialPlayer.name}</strong> has partnered with <strong>${socialPlayer.count} different players</strong> — the ultimate team player who gels with everyone!`);
-}
+scored.forEach(h => [h.pairAIds, h.pairBIds].forEach(pr => { if (pr.length === 2) { const [a, b] = pr; (teammates[a] = teammates[a] || new Set()).add(b); (teammates[b] = teammates[b] || new Set()).add(a); } }));
+const social = uniqueTop(Object.entries(teammates).filter(([, set]) => set.size >= 3).map(([id, set]) => ({ id, c: set.size })), o => o.c);
+if (social) pushFact("PARTNER_DIVERSITY", [social.id], "🌟", `<strong>${byId(social.id)?.name}</strong> has partnered with <strong>${social.c} different players</strong> — the ultimate team player who gels with everyone!`, 55 + social.c * 4);
 
-// 6. Biggest blowout (wide margin — different from CLOSE_SCORING)
-let biggestWin = { ids: null, names: null, margin: 0, score: "" };
-scored.forEach(h => {
-const m = Math.abs(h.scoreA - h.scoreB);
-if (m > biggestWin.margin) {
-const winIds = h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds;
-const names = winIds.map(id => byId(id)?.name).filter(Boolean);
-biggestWin = { ids: winIds, names, margin: m, score: `${Math.max(h.scoreA,h.scoreB)}–${Math.min(h.scoreA,h.scoreB)}` };
-}
-});
-if (biggestWin.names && biggestWin.ids && biggestWin.margin >= 8) {
-pushFact("BLOWOUT", biggestWin.ids, "💥", `Biggest blowout goes to <strong>${biggestWin.names.join(" & ")}</strong> — they crushed it <strong>${biggestWin.score}</strong>! Dominant!`);
-}
+// BLOWOUT — unique biggest margin
+const blow = uniqueTop(scored.map(h => ({ h, m: Math.abs(h.scoreA - h.scoreB) })).filter(o => o.m >= 8), o => o.m);
+if (blow) { const h = blow.h, winIds = h.scoreA > h.scoreB ? h.pairAIds : h.pairBIds, names = winIds.map(id => byId(id)?.name).filter(Boolean); pushFact("BLOWOUT", winIds, "💥", `Biggest blowout goes to <strong>${names.join(" & ")}</strong> — they crushed it <strong>${Math.max(h.scoreA, h.scoreB)}–${Math.min(h.scoreA, h.scoreB)}</strong>! Dominant!`, 55 + blow.m * 2); }
 
-// 7. Longest win streak
-const playerLastResults = {};
-history.forEach(h => {
-if (h.scoreA === null) return;
-const aWon = h.scoreA > h.scoreB;
-[...h.pairAIds, ...h.pairBIds].forEach(id => {
-if (!playerLastResults[id]) playerLastResults[id] = [];
-const won = h.pairAIds.includes(id) ? aWon : !aWon;
-playerLastResults[id].push(won);
-});
-});
-let bestStreak = { id: null, name: null, streak: 0 };
-Object.entries(playerLastResults).forEach(([id, results]) => {
-let streak = 0, max = 0;
-results.forEach(w => { streak = w ? streak + 1 : 0; max = Math.max(max, streak); });
-if (max > bestStreak.streak) bestStreak = { id, name: byId(id)?.name, streak: max };
-});
-if (bestStreak.id && bestStreak.streak >= 3) {
-pushFact("WIN_STREAK", [bestStreak.id], "🚀", `<strong>${bestStreak.name}</strong> is riding a hot streak — <strong>${bestStreak.streak} wins in a row</strong>! Can anyone stop them?`);
-}
+// WIN_STREAK — unique longest
+const playerResults = {};
+history.forEach(h => { if (h.scoreA === null) return; const aWon = h.scoreA > h.scoreB; [...h.pairAIds, ...h.pairBIds].forEach(id => (playerResults[id] = playerResults[id] || []).push(h.pairAIds.includes(id) ? aWon : !aWon)); });
+const streakTop = uniqueTop(Object.entries(playerResults).map(([id, res]) => { let st = 0, mx = 0; res.forEach(w => { st = w ? st + 1 : 0; mx = Math.max(mx, st); }); return { id, streak: mx }; }).filter(o => o.streak >= 3), o => o.streak);
+if (streakTop) pushFact("WIN_STREAK", [streakTop.id], "🚀", `<strong>${byId(streakTop.id)?.name}</strong> is riding a hot streak — <strong>${streakTop.streak} wins in a row</strong>! Can anyone stop them?`, 60 + streakTop.streak * 7);
 
-// 8. Most games played
-const mostGames = [...players].sort((a,b) => b.matches - a.matches)[0];
-if (mostGames && mostGames.matches >= 5) {
-pushFact("GAMES_LEADER", [mostGames.id], "🏃", `<strong>${mostGames.name}</strong> has played the most games of anyone — <strong>${mostGames.matches} matches</strong> and still going strong. The heart of the group!`);
-}
 
-// 9. Frequent opponents
+// RIVALRY + HEAD_TO_HEAD — unique most-frequent pair
 const rivalStats = {};
-scored.forEach(h => {
-h.pairAIds.forEach(a => h.pairBIds.forEach(b => {
-const key = [a,b].sort().join("|");
-rivalStats[key] = (rivalStats[key] || 0) + 1;
-}));
-});
-const topRival = Object.entries(rivalStats).sort((a,b) => b[1]-a[1])[0];
-if (topRival && topRival[1] >= 3) {
-const [id1, id2] = topRival[0].split("|");
-const n1 = byId(id1)?.name, n2 = byId(id2)?.name;
-if (n1 && n2) pushFact("RIVALRY", [id1, id2], "⚔️", `<strong>${n1}</strong> and <strong>${n2}</strong> have faced each other across the net <strong>${topRival[1]} times</strong> — the group's most compelling rivalry!`);
+scored.forEach(h => h.pairAIds.forEach(a => h.pairBIds.forEach(b => { const k = [a, b].sort().join("|"); rivalStats[k] = (rivalStats[k] || 0) + 1; })));
+const rivalTop = uniqueTop(Object.entries(rivalStats).filter(([, c]) => c >= 3).map(([k, c]) => ({ k, c })), o => o.c);
+if (rivalTop) {
+const [id1, id2] = rivalTop.k.split("|"), n1 = byId(id1)?.name, n2 = byId(id2)?.name;
+if (n1 && n2) {
+pushFact("RIVALRY", [id1, id2], "⚔️", `<strong>${n1}</strong> and <strong>${n2}</strong> have faced each other across the net <strong>${rivalTop.c} times</strong> — the group's most compelling rivalry!`, 55 + rivalTop.c * 4);
+let w1 = 0, w2 = 0;
+scored.forEach(h => { const a1 = h.pairAIds.includes(id1), b1 = h.pairBIds.includes(id1), a2 = h.pairAIds.includes(id2), b2 = h.pairBIds.includes(id2); if (!((a1 && b2) || (b1 && a2))) return; const aWon = h.scoreA > h.scoreB; if ((a1 && aWon) || (b1 && !aWon)) w1++; else w2++; });
+if (w1 !== w2) { const lead = w1 > w2 ? n1 : n2, hi = Math.max(w1, w2), lo = Math.min(w1, w2); pushFact("HEAD_TO_HEAD", [id1, id2], "🥊", `In the <strong>${n1}</strong> vs <strong>${n2}</strong> rivalry, <strong>${lead}</strong> leads the head-to-head <strong>${hi}–${lo}</strong>.`, 58 + (hi - lo) * 6); }
+}
 }
 
-// 10. Exclusive partnership
+// EXCLUSIVE_DUO — unique (most wins among exclusive players)
 const partnerCount = {};
-scored.forEach(h => {
-[{ ids: h.pairAIds }, { ids: h.pairBIds }].forEach(({ ids }) => {
-if (ids.length === 2) {
-partnerCount[ids[0]] = partnerCount[ids[0]] || new Set();
-partnerCount[ids[1]] = partnerCount[ids[1]] || new Set();
-partnerCount[ids[0]].add(ids[1]);
-partnerCount[ids[1]].add(ids[0]);
-}
-});
-});
-let loyalDuo = null, minPartners = Infinity;
-players.forEach(p => {
-if (p.wins >= 2 && partnerCount[p.id] && partnerCount[p.id].size < minPartners) {
-minPartners = partnerCount[p.id].size;
-loyalDuo = p;
-}
-});
-if (loyalDuo && minPartners === 1) {
-const partId = [...(partnerCount[loyalDuo.id] || [])][0];
-const partName = byId(partId)?.name;
-if (partName) pushFact("EXCLUSIVE_DUO", [loyalDuo.id, partId], "💞", `<strong>${loyalDuo.name}</strong> and <strong>${partName}</strong> have only ever partnered with each other — a loyal duo through and through!`);
+scored.forEach(h => [h.pairAIds, h.pairBIds].forEach(ids => { if (ids.length === 2) { (partnerCount[ids[0]] = partnerCount[ids[0]] || new Set()).add(ids[1]); (partnerCount[ids[1]] = partnerCount[ids[1]] || new Set()).add(ids[0]); } }));
+const exclTop = uniqueTop(players.filter(p => p.wins >= 2 && partnerCount[p.id] && partnerCount[p.id].size === 1), p => p.wins);
+if (exclTop) { const partId = [...partnerCount[exclTop.id]][0], partName = byId(partId)?.name; if (partName) pushFact("EXCLUSIVE_DUO", [exclTop.id, partId], "💞", `<strong>${exclTop.name}</strong> and <strong>${partName}</strong> have only ever partnered with each other — a loyal duo through and through!`, 60 + exclTop.wins * 5); }
+
+// UNDEFEATED — unique (most games among undefeated)
+const undefTop = uniqueTop(players.filter(p => p.matches >= 3 && p.wins === p.matches), p => p.matches);
+if (undefTop) pushFact("UNDEFEATED", [undefTop.id], "👑", `<strong>${undefTop.name}</strong> remains <strong>undefeated</strong> after ${undefTop.matches} games. Royalty on the court!`, 85 + undefTop.matches * 2);
+
+// #1 Point-difference leader — unique
+const pdTop = uniqueTop(players.filter(p => p.matches >= 2 && (p.pointsDiff || 0) >= 6), p => p.pointsDiff);
+if (pdTop) pushFact("POINT_DIFF_LEADER", [pdTop.id], "📊", `<strong>${pdTop.name}</strong> owns the scoresheet with a commanding <strong>+${pdTop.pointsDiff} point difference</strong> — outscoring the room.`, 60 + Math.min(pdTop.pointsDiff, 40));
+
+// #2 Upset of the day — unique biggest skill gap
+const upTop = uniqueTop(scored.map(h => { const a = h.pairAIds.map(byId), b = h.pairBIds.map(byId); if (a.some(x => !x) || b.some(x => !x)) return null; const avgA = (a[0].skill + a[1].skill) / 2, avgB = (b[0].skill + b[1].skill) / 2, aWon = h.scoreA > h.scoreB; return { h, gap: aWon ? avgB - avgA : avgA - avgB, winIds: aWon ? h.pairAIds : h.pairBIds }; }).filter(o => o && o.gap >= 1.5), o => o.gap);
+if (upTop) { const h = upTop.h, names = upTop.winIds.map(id => byId(id)?.name).filter(Boolean); pushFact("UPSET", upTop.winIds, "🐉", `<strong>${names.join(" & ")}</strong> pulled off the upset of the day, toppling a much stronger pair <strong>${Math.max(h.scoreA, h.scoreB)}–${Math.min(h.scoreA, h.scoreB)}</strong>. Giant-killers!`, 65 + upTop.gap * 8); }
+
+// #4 Highest-scoring match — unique highest total
+const topScore = uniqueTop(scored.map(h => ({ h, total: h.scoreA + h.scoreB })).filter(o => o.total >= 30), o => o.total);
+if (topScore) { const h = topScore.h; pushFact("TOP_SCORING_MATCH", [...h.pairAIds, ...h.pairBIds], "🍿", `Highest-scoring clash: <strong>${h.pairA.join(" & ")}</strong> vs <strong>${h.pairB.join(" & ")}</strong> — <strong>${topScore.total} points</strong> in one game!`, 55 + (topScore.total - 30)); }
+
+// #5 Hot finish — unique biggest improvement
+const hotTop = uniqueTop(players.map(p => { const pm = matchesOf(p.id); if (pm.length < 4) return null; const won = h => (h.pairAIds.includes(p.id) ? h.scoreA > h.scoreB : h.scoreB > h.scoreA); const half = Math.floor(pm.length / 2); const fr = pm.slice(0, half).filter(won).length / half, sa = pm.slice(half), sr = sa.filter(won).length / sa.length; return { p, imp: sr - fr }; }).filter(o => o && o.imp >= 0.34), o => o.imp);
+if (hotTop) pushFact("HOT_FINISH", [hotTop.p.id], "📈", `<strong>${hotTop.p.name}</strong> caught fire late — winning far more in the back half of the night than the start.`, 62 + hotTop.imp * 30);
+
+// #6 Most efficient scorer — unique highest points-per-game (not League)
+if (scoringStyle !== "league") {
+const effTop = uniqueTop(players.filter(p => p.matches >= 2).map(p => ({ p, ppg: p.points / p.matches })).filter(o => o.ppg > 0), o => o.ppg);
+if (effTop) pushFact("EFFICIENT_SCORER", [effTop.p.id], "⚡", `<strong>${effTop.p.name}</strong> is the most efficient scorer, averaging <strong>${effTop.ppg.toFixed(1)} points a game</strong>.`, 58 + effTop.ppg * 0.4);
 }
 
-// 11. Undefeated record
-players.forEach(p => {
-if (p.matches >= 3 && p.wins === p.matches) {
-pushFact("UNDEFEATED", [p.id], "👑", `<strong>${p.name}</strong> remains <strong>undefeated</strong> after ${p.matches} games. Royalty on the court!`);
-}
-});
+// #10 Lucky charm — unique highest team win rate
+const teamWin = {};
+scored.forEach(h => { const aWon = h.scoreA > h.scoreB; [{ ids: h.pairAIds, won: aWon }, { ids: h.pairBIds, won: !aWon }].forEach(({ ids, won }) => ids.forEach(id => { const t = (teamWin[id] = teamWin[id] || { w: 0, t: 0 }); t.t++; if (won) t.w++; })); });
+const charmTop = uniqueTop(players.filter(p => teamWin[p.id] && teamWin[p.id].t >= 3).map(p => ({ p, rate: teamWin[p.id].w / teamWin[p.id].t })).filter(o => o.rate >= 0.6), o => o.rate);
+if (charmTop) pushFact("LUCKY_CHARM", [charmTop.p.id], "🍀", `Pair up with <strong>${charmTop.p.name}</strong> and you tend to win — teams with them win <strong>${Math.round(charmTop.rate * 100)}%</strong> of the time.`, 55 + charmTop.rate * 40);
 
-// Shuffle candidates, then pick up to 3: unique fact types, no player in more than one slot
-for (let i = facts.length - 1; i > 0; i--) {
-const j = Math.floor(Math.random() * (i + 1));
-[facts[i], facts[j]] = [facts[j], facts[i]];
-}
-const usedTypes = new Set();
-const usedPlayerIds = new Set();
-const chosen = [];
-for (const f of facts) {
-if (chosen.length >= 3) break;
-if (usedTypes.has(f.type)) continue;
-if (f.subjectIds.some(id => usedPlayerIds.has(id))) continue;
-chosen.push(f);
-usedTypes.add(f.type);
-f.subjectIds.forEach(id => usedPlayerIds.add(id));
-}
+// pick 3: best instance per type, light jitter for variety, no player twice
+const bestByType = {};
+facts.forEach(f => { if (!bestByType[f.type] || f.score > bestByType[f.type].score) bestByType[f.type] = f; });
+const ordered = Object.values(bestByType).map(f => ({ f, key: f.score + Math.random() * 8 })).sort((x, y) => y.key - x.key).map(o => o.f);
+const usedPlayerIds = new Set(), chosen = [];
+for (const f of ordered) { if (chosen.length >= 3) break; if (f.subjectIds.some(id => usedPlayerIds.has(id))) continue; chosen.push(f); f.subjectIds.forEach(id => usedPlayerIds.add(id)); }
 return chosen.map(({ emoji, text }) => ({ emoji, text }));
 }
 
@@ -2211,37 +2532,191 @@ list.innerHTML = facts.map(f => `
 </div>`).join("");
 }
 
+function roundRect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function wrapText(ctx, text, maxW) { const words = text.split(/\s+/); const lines = []; let cur = ""; for (const w of words) { const t = cur ? cur + " " + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; } if (cur) lines.push(cur); return lines; }
+function clipText(ctx, text, maxW) { if (ctx.measureText(text).width <= maxW) return text; let t = text; while (t.length > 1 && ctx.measureText(t + "\u2026").width > maxW) t = t.slice(0, -1); return t + "\u2026"; }
+
+function computeLeaderboardData() {
+const totalPoints = players.reduce((s, p) => s + p.points, 0);
+const totalGP = players.reduce((s, p) => s + p.matches, 0);
+const avgPPG = totalGP > 0 ? totalPoints / totalGP : 0;
+const maxGP = players.reduce((mx, p) => Math.max(mx, p.matches), 0);
+const metric = (p) => scoringStyle === "adjpts" ? p.points + (maxGP - p.matches) * avgPPG : scoringStyle === "ptspergp" ? (p.matches > 0 ? p.points / p.matches : 0) : p.points;
+const ranked = [...players].sort((a, b) => { const ma = metric(a), mb = metric(b); if (mb !== ma) return mb - ma; if (b.wins !== a.wins) return b.wins - a.wins; return (b.pointsDiff || 0) - (a.pointsDiff || 0); });
+let header, valueFn, showStar = false;
+if (scoringStyle === "league") { header = "League"; valueFn = p => p.points; }
+else if (scoringStyle === "adjpts") { header = "Adj-Pts"; valueFn = p => Math.round(metric(p)); showStar = true; }
+else if (scoringStyle === "ptspergp") { header = "Pts/GP"; valueFn = p => (p.matches > 0 ? (p.points / p.matches).toFixed(1) : "0.0"); }
+else { header = "Points"; valueFn = p => p.points; }
+return { ranked, header, valueFn, showStar, maxGP };
+}
+
+function drawCard(ctx, x, y, w, h) { ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "#d8e3ff"; ctx.lineWidth = 1; roundRect(ctx, x, y, w, h, 14); ctx.fill(); ctx.stroke(); }
+
+const RANKING_HELP = {
+points: [["1","Points","Your pair's score in each match is added to your total. Win 21–15 and you earn 21 pts; opponents earn 15 each. More points = higher rank."],["2","Wins","If two players have equal points, the one with more match wins ranks higher."],["3","Points difference","Still tied? Your total score margin across all games (win 21–15 is +6, lose it is −6). A higher difference ranks higher."]],
+adjpts: [["1","Adjusted points","Players who have played fewer games are topped up so totals are comparable. Each missing game is credited at the group's average points per game."],["2","The maths","Adjusted = your points + (most games anyone played − your games) × average points per game. A * marks anyone who got a top-up."],["3","Tiebreakers","Equal adjusted points? More wins ranks higher, then points difference."]],
+league: [["1","League points","Win a match and each player on the winning pair earns 3 points; the losing pair earns 1 point each."],["2","Wins","Match wins are tracked separately. If league points are tied, the player with more wins ranks higher."],["3","Points difference","Still tied? The player with the better total score margin ranks higher."]],
+ptspergp: [["1","Points per game","Your total points divided by games played, so the ranking stays fair even when people play different numbers of games."],["2","Wins","Equal points per game? The player with more wins ranks higher."],["3","Points difference","Still tied? The player with the better total score margin ranks higher."]]
+};
+
+function generateShareCanvas() {
+const data = computeLeaderboardData();
+const facts = computeFunFacts();
+const help = RANKING_HELP[scoringStyle] || RANKING_HELP.points;
+const W = 820, OUT = 16, PAD = 22, S = 2, FONT = "Inter, Segoe UI, Roboto, Arial, sans-serif";
+const CW = W - OUT * 2, innerL = OUT + PAD, innerR = W - OUT - PAD, contentW = innerR - innerL;
+const M = document.createElement("canvas").getContext("2d");
+const hasName = !!sessionName.trim();
+
+const brandH = 58, sessionH = 30, lbHeadH = 26, ROW = 38, ROWGAP = 6, GAP = 12;
+const card1H = (sessionH + 12 + lbHeadH + data.ranked.length * (ROW + ROWGAP)) + PAD * 2;
+M.font = "15px " + FONT;
+const factBlocks = facts.map(f => ({ emoji: f.emoji, lines: wrapText(M, f.text.replace(/<[^>]+>/g, ""), contentW - 34) }));
+const factBoxH = (b) => 14 + Math.max(b.lines.length * 20, 22);
+const card2H = facts.length ? (26 + factBlocks.reduce((a, b) => a + factBoxH(b) + 8, 0)) + PAD * 2 : 0;
+M.font = "14px " + FONT;
+const helpItems = help.map(it => ({ n: it[0], title: it[1], lines: wrapText(M, it[2], contentW - 40) }));
+const helpItemH = (it) => 22 + it.lines.length * 19 + 10;
+const card3H = (26 + helpItems.reduce((a, it) => a + helpItemH(it), 0)) + PAD * 2;
+const totalH = OUT + brandH + GAP + card1H + GAP + (facts.length ? card2H + GAP : 0) + card3H + OUT;
+
+const canvas = document.createElement("canvas");
+canvas.width = W * S; canvas.height = Math.ceil(totalH) * S;
+const ctx = canvas.getContext("2d"); ctx.scale(S, S);
+ctx.fillStyle = "#e7eeff"; ctx.fillRect(0, 0, W, totalH);
+
+let y = OUT;
+ctx.textAlign = "left"; ctx.fillStyle = "#1b2340"; ctx.font = "700 28px " + FONT; ctx.fillText("ShuttleMix", OUT + 6, y + 26);
+ctx.fillStyle = "#5f6d94"; ctx.font = "13px " + FONT; ctx.fillText("Badminton matchmaking", OUT + 6, y + 46);
+y += brandH + GAP;
+
+drawCard(ctx, OUT, y, CW, card1H);
+let cy = y + PAD;
+if (hasName) { ctx.textAlign = "left"; ctx.fillStyle = "#1b2340"; ctx.font = "700 20px " + FONT; ctx.fillText(clipText(ctx, sessionName.trim(), contentW - 230), innerL, cy + 20); }
+ctx.textAlign = "right"; ctx.fillStyle = "#4f6fff"; ctx.font = "600 14px " + FONT; ctx.fillText(fmtSessionDate(sessionDate), innerR, cy + 19);
+cy += sessionH + 12;
+const rankCx = innerL + 16, nameL = innerL + 44, valR = innerR - 6, wonR = innerR - 92, gpR = innerR - 168;
+ctx.fillStyle = "#6a769f"; ctx.font = "600 12px " + FONT;
+ctx.textAlign = "center"; ctx.fillText("#", rankCx, cy + 16);
+ctx.textAlign = "left"; ctx.fillText("NAME", nameL, cy + 16);
+ctx.textAlign = "right"; ctx.fillText("GP", gpR, cy + 16); ctx.fillText("WON", wonR, cy + 16); ctx.fillText(data.header.toUpperCase(), valR, cy + 16);
+cy += lbHeadH;
+const medals = ["🥇", "🥈", "🥉"];
+data.ranked.forEach((p, i) => {
+const ry = cy + i * (ROW + ROWGAP), midY = ry + ROW / 2 + 5;
+ctx.fillStyle = "#f5f8ff"; ctx.strokeStyle = "#e1e9ff"; ctx.lineWidth = 1; roundRect(ctx, innerL, ry, contentW, ROW, 10); ctx.fill(); ctx.stroke();
+ctx.textAlign = "center";
+if (i < 3) { ctx.font = "20px " + FONT; ctx.fillText(medals[i], rankCx, ry + ROW / 2 + 7); }
+else { ctx.fillStyle = "#5f6d94"; ctx.font = "600 14px " + FONT; ctx.fillText(String(i + 1), rankCx, midY); }
+ctx.textAlign = "left"; ctx.fillStyle = "#1b2340"; ctx.font = "700 15px " + FONT;
+ctx.fillText(clipText(ctx, p.name + ((data.showStar && p.matches < data.maxGP) ? " *" : ""), gpR - nameL - 30), nameL, midY);
+ctx.textAlign = "right"; ctx.font = "600 14px " + FONT; ctx.fillStyle = "#5f6d94"; ctx.fillText(String(p.matches), gpR, midY);
+ctx.fillStyle = "#22a96e"; ctx.fillText(String(p.wins), wonR, midY);
+ctx.fillStyle = "#e0901a"; ctx.font = "700 15px " + FONT; ctx.fillText(String(data.valueFn(p)), valR, midY);
+});
+y += card1H + GAP;
+
+if (facts.length) {
+drawCard(ctx, OUT, y, CW, card2H);
+let fy = y + PAD;
+ctx.textAlign = "left"; ctx.fillStyle = "#6a769f"; ctx.font = "700 13px " + FONT; ctx.fillText("✨ DID YOU KNOW?", innerL, fy + 16); fy += 26;
+factBlocks.forEach(b => {
+const bh = factBoxH(b);
+ctx.fillStyle = "#f8faff"; ctx.strokeStyle = "#e1e9ff"; ctx.lineWidth = 1; roundRect(ctx, innerL, fy, contentW, bh - 4, 10); ctx.fill(); ctx.stroke();
+ctx.textAlign = "left"; ctx.font = "17px " + FONT; ctx.fillStyle = "#1b2340"; ctx.fillText(b.emoji, innerL + 12, fy + 24);
+ctx.font = "15px " + FONT; ctx.fillStyle = "#3b4e84"; b.lines.forEach((ln, li) => ctx.fillText(ln, innerL + 40, fy + 23 + li * 20));
+fy += bh + 8;
+});
+y += card2H + GAP;
+}
+
+drawCard(ctx, OUT, y, CW, card3H);
+let hy = y + PAD;
+ctx.textAlign = "left"; ctx.fillStyle = "#6a769f"; ctx.font = "700 13px " + FONT; ctx.fillText("HOW RANKINGS WORK", innerL, hy + 16); hy += 26;
+const bg = ["#fff4e0", "#e6f8ee", "#eef3ff"], fg = ["#f5a623", "#22a96e", "#4f6fff"];
+helpItems.forEach((it, idx) => {
+ctx.fillStyle = bg[idx % 3]; roundRect(ctx, innerL, hy, 24, 24, 7); ctx.fill();
+ctx.fillStyle = fg[idx % 3]; ctx.font = "700 13px " + FONT; ctx.textAlign = "center"; ctx.fillText(it.n, innerL + 12, hy + 16);
+ctx.textAlign = "left"; ctx.fillStyle = "#1b2340"; ctx.font = "700 14px " + FONT; ctx.fillText(it.title, innerL + 36, hy + 16);
+ctx.fillStyle = "#5f6d94"; ctx.font = "14px " + FONT; it.lines.forEach((ln, li) => ctx.fillText(ln, innerL + 36, hy + 36 + li * 19));
+hy += helpItemH(it);
+});
+
+return canvas;
+}
+
+function shareLeaderboardImage() {
+let canvas;
+try { canvas = generateShareCanvas(); } catch (e) { alert("Could not build the image."); return; }
+canvas.toBlob((blob) => {
+if (!blob) { alert("Could not build the image."); return; }
+const fname = "ShuttleMix-" + (sessionDate || todayISO()) + ".png";
+const file = new File([blob], fname, { type: "image/png" });
+const title = sessionName.trim() || "ShuttleMix leaderboard";
+if (navigator.canShare && navigator.canShare({ files: [file] })) {
+navigator.share({ files: [file], title }).catch(() => {});
+return;
+}
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a"); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+setTimeout(() => URL.revokeObjectURL(url), 1500);
+}, "image/png");
+}
+
 function renderLeaderboard() {
+const _sdl = document.getElementById("sessionDateLabel"); if (_sdl) _sdl.textContent = fmtSessionDate(sessionDate);
+const _sni = document.getElementById("sessionNameInput"); if (_sni && document.activeElement !== _sni) _sni.value = sessionName;
 document.querySelectorAll(".ranking-style-segment").forEach(btn => {
 btn.classList.toggle("active", btn.dataset.scoringStyle === scoringStyle);
 });
-const helpPoints = document.getElementById("rankingsHelpPoints");
-const helpLeague = document.getElementById("rankingsHelpLeague");
-if (helpPoints && helpLeague) {
-const league = scoringStyle === "league";
-helpPoints.style.display = league ? "none" : "flex";
-helpLeague.style.display = league ? "flex" : "none";
-}
+const helpIds = { points: "rankingsHelpPoints", adjpts: "rankingsHelpAdj", league: "rankingsHelpLeague", ptspergp: "rankingsHelpPtsGp" };
+Object.entries(helpIds).forEach(([style, id]) => {
+const el = document.getElementById(id);
+if (el) el.style.display = (style === scoringStyle) ? "flex" : "none";
+});
 const box = document.getElementById("leaderboardTable");
 if (!players.length) { box.innerHTML = '<div class="muted">No players yet.</div>'; renderFunFacts(); return; }
+
+const totalPoints = players.reduce((sum, p) => sum + p.points, 0);
+const totalGP = players.reduce((sum, p) => sum + p.matches, 0);
+const avgPPG = totalGP > 0 ? totalPoints / totalGP : 0;
+const maxGP = players.reduce((mx, p) => Math.max(mx, p.matches), 0);
+
+const metric = (p) => {
+if (scoringStyle === "adjpts") return p.points + (maxGP - p.matches) * avgPPG;
+if (scoringStyle === "ptspergp") return p.matches > 0 ? p.points / p.matches : 0;
+return p.points;
+};
+
 const ranked = [...players].sort((a, b) => {
-if (b.points !== a.points) return b.points - a.points;
+const ma = metric(a), mb = metric(b);
+if (mb !== ma) return mb - ma;
 if (b.wins !== a.wins) return b.wins - a.wins;
-if (a.matches !== b.matches) return a.matches - b.matches;
-return a.skill - b.skill;
+return (b.pointsDiff || 0) - (a.pointsDiff || 0);
 });
+
 const medals = ["🥇", "🥈", "🥉"];
 const rankClasses = ["top1", "top2", "top3"];
-const ptsHeader = scoringStyle === "league" ? "League pts" : "Points";
+let ptsHeader, valueFn, showStar = false;
+if (scoringStyle === "league") { ptsHeader = "League"; valueFn = p => p.points; }
+else if (scoringStyle === "adjpts") { ptsHeader = "Adj-Pts"; valueFn = p => Math.round(metric(p)); showStar = true; }
+else if (scoringStyle === "ptspergp") { ptsHeader = "Pts/GP"; valueFn = p => (p.matches > 0 ? (p.points / p.matches).toFixed(1) : "0.0"); }
+else { ptsHeader = "Points"; valueFn = p => p.points; }
+
 let rows = ranked.map((p, i) => {
 const rankDisplay = i < 3 ? medals[i] : (i + 1);
 const rankClass = i < 3 ? rankClasses[i] : "";
+const missing = maxGP - p.matches;
+const star = (showStar && missing > 0)
+? `<span title="Adjusted: +${Math.round(missing * avgPPG)} pts credited for ${missing} unplayed game(s)" style="color:#f5a623;font-weight:800;">*</span>`
+: "";
 return `<tr>
 <td class="lb-rank ${rankClass}">${rankDisplay}</td>
-<td class="lb-name">${p.name}</td>
+<td class="lb-name">${p.name}${star}</td>
 <td class="lb-gp right">${p.matches}</td>
 <td class="lb-wins right">${p.wins}</td>
-<td class="lb-points right">${p.points}</td>
+<td class="lb-points right">${valueFn(p)}</td>
 </tr>`;
 }).join("");
 box.innerHTML = `<table class="lb-table">
@@ -2269,20 +2744,32 @@ const name = nameInput.value.trim();
 const skill = Number(skillInput.value);
 if (!name) return alert("Enter player name.");
 if (Number.isNaN(skill) || skill < 1 || skill > 10) return alert("Skill must be 1.0 to 10.0");
-players.push({ id: crypto.randomUUID(), name, skill, matches: 0, wins: 0, points: 0, priority: false, skip: false });
+players.push({ id: crypto.randomUUID(), name, gender: selectedGender, skill, matches: 0, wins: 0, points: 0, priority: false, skip: false, priorityLock: false, skipLock: false, pointsDiff: 0 });
 nameInput.value = "";
 skillInput.value = "";
+setGenderUI("M");
 renderPlayers();
 renderStats();
 };
 
 document.getElementById("resetBtn").onclick = () => {
-players = JSON.parse(JSON.stringify(defaultPlayers));
+const usingCustom = customDefaults && customDefaults.length;
+const src = usingCustom ? "your saved default roster" : "the built-in sample roster";
+if (!confirm(`Reset to ${src}?\n\nThis clears all games played, scores, match history, and priority/skip tags. This cannot be undone.`)) return;
+const base = usingCustom ? customDefaults : defaultPlayers;
+players = base.map(p => ({ id: crypto.randomUUID(), name: p.name, gender: (p.gender === "F" ? "F" : "M"), skill: p.skill, matches: 0, wins: 0, points: 0, priority: false, skip: false, priorityLock: false, skipLock: false, pointsDiff: 0 }));
 history = [];
 editingId = null;
 seenPairings.clear();
-pendingByCourt = { 1: null, 2: null, 3: null, 4: null };
+courtSlots = { 1:[null,null,null,null], 2:[null,null,null,null], 3:[null,null,null,null], 4:[null,null,null,null] };
+courtSlotManual = { 1:[false,false,false,false], 2:[false,false,false,false], 3:[false,false,false,false], 4:[false,false,false,false] };
+courtMode = { 1:"", 2:"", 3:"", 4:"" };
+saveCourts();
 for (let c = 1; c <= MAX_COURTS; c++) courtRerollSeen[c].clear();
+sortState = { col: null, dir: 1 };
+localStorage.removeItem("shuttlemix_ps_hint_seen");
+sessionDate = todayISO();
+localStorage.setItem("shuttlemix_session_date", sessionDate);
 // Reset toolbar state too
 const toolbar = document.getElementById("toolbar");
 const addBtn = document.getElementById("addPlayerBtn");
@@ -2319,25 +2806,22 @@ document.getElementById(tab.dataset.view).classList.add("active");
 });
 
 document.getElementById("matchResult").addEventListener("click", (e) => {
-const rr = e.target.closest(".reroll-court-btn");
-if (rr) {
-doRerollCourt(Number(rr.dataset.court));
-return;
-}
-const cc = e.target.closest(".confirm-court-btn");
-if (cc) {
-doConfirmCourt(Number(cc.dataset.court));
-return;
-}
+const rr = e.target.closest(".court-reroll-btn");
+if (rr) { doRerollCourt(Number(rr.dataset.court)); return; }
+const cc = e.target.closest(".court-confirm-btn");
+if (cc) { doConfirmCourt(Number(cc.dataset.court)); return; }
+const cl = e.target.closest(".court-clear-btn");
+if (cl) { const cc2 = Number(cl.dataset.court); courtSlots[cc2] = [null, null, null, null]; courtSlotManual[cc2] = [false, false, false, false]; saveCourts(); renderMatch(); return; }
+const mc = e.target.closest(".mode-chip");
+if (mc) { setCourtMode(Number(mc.dataset.court), mc.dataset.mode); return; }
 const es = e.target.closest(".end-save-score-btn");
-if (es) {
-finishMatchWithScore(es.dataset.hid);
-return;
-}
+if (es) { finishMatchWithScore(es.dataset.hid); return; }
 const en = e.target.closest(".end-no-score-btn");
-if (en) {
-finishMatchWithoutScore(en.dataset.hid);
-}
+if (en) { finishMatchWithoutScore(en.dataset.hid); }
+});
+document.getElementById("matchResult").addEventListener("change", (e) => {
+const sel = e.target.closest(".slot-select");
+if (sel) setSlotPlayer(Number(sel.dataset.court), Number(sel.dataset.slot), sel.value);
 });
 
 document.querySelectorAll(".court-segment").forEach(btn => {
@@ -2362,6 +2846,90 @@ btn.onclick = () => setScoringStyle(btn.dataset.scoringStyle);
 document.querySelectorAll(".format-segment").forEach(btn => {
 btn.onclick = () => setMatchmakingMode(btn.dataset.matchmaking);
 });
+
+document.querySelectorAll('#genderToggle .gender-seg').forEach(b => { b.onclick = () => setGenderUI(b.dataset.gender); });
+
+document.getElementById("editModeBtn").onclick = () => {
+editTableMode = !editTableMode;
+const btn = document.getElementById("editModeBtn");
+btn.classList.toggle("active-edit", editTableMode);
+btn.textContent = editTableMode ? "Done" : "Edit";
+if (!editTableMode && editingId) setEditMode(null);
+updateDefaultButtons();
+renderPlayers();
+};
+
+function exportBackup() {
+const rosterDefault = (customDefaults && customDefaults.length)
+? customDefaults
+: players.map(p => ({ name: p.name, gender: (p.gender === "F" ? "F" : "M"), skill: p.skill }));
+const data = { app: "ShuttleMix", version: 1, exportedAt: new Date().toISOString(), players, history, seen: Array.from(seenPairings), courtCount, scoringStyle, matchmakingMode, customDefaults: rosterDefault, sessionName, sessionDate };
+const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+const fname = "ShuttleMix-backup-" + (sessionDate || todayISO()) + ".json";
+const file = new File([blob], fname, { type: "application/json" });
+if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: "ShuttleMix backup" }).catch(() => {}); return; }
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a"); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function importBackup(file) {
+const reader = new FileReader();
+reader.onload = (e) => {
+let data;
+try { data = JSON.parse(e.target.result); } catch (err) { alert("That file isn't a valid ShuttleMix backup."); return; }
+if (!data || data.app !== "ShuttleMix" || !Array.isArray(data.players)) { alert("That file isn't a valid ShuttleMix backup."); return; }
+if (!confirm("Import this backup?\n\nIt replaces the players, match history and settings currently on this device.")) return;
+players = data.players.map(p => ({ id: p.id || crypto.randomUUID(), name: String(p.name || ""), gender: p.gender === "F" ? "F" : "M", skill: Number(p.skill) || 1, matches: Number(p.matches) || 0, wins: Number(p.wins) || 0, points: Number(p.points) || 0, priority: false, skip: false, priorityLock: false, skipLock: false, pointsDiff: Number(p.pointsDiff) || 0 }));
+history = Array.isArray(data.history) ? data.history : [];
+history.forEach(h => { if (h.closed === undefined) h.closed = false; });
+seenPairings.clear(); (Array.isArray(data.seen) ? data.seen : []).forEach(k => seenPairings.add(k));
+courtCount = (data.courtCount >= 1 && data.courtCount <= MAX_COURTS) ? data.courtCount : 1;
+scoringStyle = ["points", "adjpts", "league", "ptspergp"].includes(data.scoringStyle) ? data.scoringStyle : "points";
+matchmakingMode = data.matchmakingMode === "mexicano" ? "mexicano" : "americano";
+customDefaults = Array.isArray(data.customDefaults) ? data.customDefaults.map(p => ({ name: p.name, gender: p.gender === "F" ? "F" : "M", skill: Number(p.skill) || 1 })) : null;
+sessionName = typeof data.sessionName === "string" ? data.sessionName : "";
+sessionDate = /^\d{4}-\d{2}-\d{2}$/.test(data.sessionDate) ? data.sessionDate : todayISO();
+courtSlots = { 1: [null, null, null, null], 2: [null, null, null, null], 3: [null, null, null, null], 4: [null, null, null, null] };
+courtSlotManual = { 1: [false, false, false, false], 2: [false, false, false, false], 3: [false, false, false, false], 4: [false, false, false, false] };
+courtMode = { 1: "", 2: "", 3: "", 4: "" };
+for (let c = 1; c <= MAX_COURTS; c++) courtRerollSeen[c].clear();
+editingId = null; editTableMode = false; sortState = { col: null, dir: 1 };
+if (customDefaults) localStorage.setItem("shuttlemix_custom_defaults", JSON.stringify(customDefaults)); else localStorage.removeItem("shuttlemix_custom_defaults");
+recomputeStatsFromHistory();
+save(); saveCourts();
+const sni = document.getElementById("sessionNameInput"); if (sni) sni.value = sessionName;
+const eb = document.getElementById("editModeBtn"); if (eb) { eb.textContent = "Edit"; eb.classList.remove("active-edit"); }
+updateMatchToolbar(); updateDefaultButtons();
+renderPlayers(); renderMatch(); renderHistory(); renderLeaderboard();
+alert("Backup imported. Tip: to start a fresh session with these players, use Reset Data.");
+};
+reader.readAsText(file);
+}
+
+document.getElementById("saveDefaultBtn").onclick = () => {
+if (!confirm("Save the current roster (names, gender, skill) as your default?\n\nReset Data will then restore THIS roster instead of the built-in sample.")) return;
+customDefaults = players.map(p => ({ name: p.name, gender: (p.gender === "F" ? "F" : "M"), skill: p.skill }));
+localStorage.setItem("shuttlemix_custom_defaults", JSON.stringify(customDefaults));
+updateDefaultButtons();
+alert("Saved. Reset Data will now restore your default roster on this device.");
+};
+
+document.getElementById("exportBtn").onclick = exportBackup;
+document.getElementById("importBtn").onclick = () => { const fi = document.getElementById("importFile"); if (fi) fi.click(); };
+const _impFile = document.getElementById("importFile");
+if (_impFile) _impFile.addEventListener("change", (e) => { const f = e.target.files && e.target.files[0]; if (f) importBackup(f); e.target.value = ""; });
+
+setGenderUI("M");
+updateDefaultButtons();
+
+const sessionNameInput = document.getElementById("sessionNameInput");
+if (sessionNameInput) {
+sessionNameInput.value = sessionName;
+sessionNameInput.addEventListener("input", (e) => { sessionName = e.target.value; localStorage.setItem("shuttlemix_session_name", sessionName); });
+}
+const shareLbBtn = document.getElementById("shareLbBtn");
+if (shareLbBtn) shareLbBtn.onclick = shareLeaderboardImage;
 
 recomputeStatsFromHistory();
 
