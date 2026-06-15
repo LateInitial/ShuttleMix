@@ -1,8 +1,8 @@
-# ShuttleMix
+# CourtMixer
 
-A simple, self-contained matchmaking app for social **badminton, tennis, or padel** sessions. Add your players and it generates fair, balanced doubles matches round after round — handling skill balance, rest rotation, game-count fairness, and repeat-pairing avoidance. It runs entirely in the browser with no accounts, no server, and no internet needed after the page loads.
+A simple, self-contained matchmaking app for social **court sports** — badminton, tennis, or padel. Add your players and it generates fair, balanced doubles matches round after round — handling skill balance, rest rotation, game-count fairness, and repeat-pairing avoidance. It runs entirely in the browser with no accounts, no server, and no internet needed after the page loads.
 
-**Live app:** https://lateinitial.github.io/ShuttleMix/
+**Live app:** https://lateinitial.github.io/CourtMixer/
 
 ## Features
 
