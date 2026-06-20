@@ -755,6 +755,12 @@ grid-template-columns: 26px minmax(84px,1fr) 34px 44px 54px 46px;
 .col-sort { cursor:pointer; user-select:none; }
 button#editModeBtn.active-edit { background:#4f6fff; }
 .row { min-height: 50px; }
+.subtabs { display:flex; gap:6px; margin-bottom:10px; }
+.subtab { flex:1; text-align:center; padding:8px 6px; font-size:13px; font-weight:600; color:#6f7ca3; background:#eef3ff; border:1px solid #cbd8ff; border-radius:10px; cursor:pointer; }
+.subtab.active { background:#fff; color:#4f6fff; border-color:#4f6fff; }
+.subview { display:none; }
+.subview.active { display:block; }
+.table-inner.stats-mode .header-row, .table-inner.stats-mode .row { grid-template-columns: 24px minmax(70px,1fr) 32px 34px 38px 38px 38px; }
 .state-box { width:22px; height:22px; border-radius:6px; border:1.5px solid #c2d0ff; background:#fff; cursor:pointer; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:13px; line-height:1; color:#6f7ca3; user-select:none; touch-action:none; }
 .state-box.on-priority { border-color:var(--ok-border); background:#e3f6ec; color:#1f8a52; }
 .state-box.on-skip { border-color:var(--skip-border); background:#fde7e9; color:#c0414a; }
@@ -865,9 +871,23 @@ button#editModeBtn.active-edit { background:#4f6fff; }
 </div>
 </section>
 <section id="historyView" class="view">
+<div class="subtabs" id="historySubtabs">
+<button type="button" class="subtab active" data-subview="matchHistoryPane">Match History</button>
+<button type="button" class="subtab" data-subview="matchStatsPane">Match Stats</button>
+</div>
+<div id="matchHistoryPane" class="subview active">
 <div class="card">
 <div id="stats" class="muted" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">No matches yet.</div>
 <div id="historyList"></div>
+</div>
+</div>
+<div id="matchStatsPane" class="subview">
+<div class="card">
+<div class="table-scroll"><div class="table-inner stats-mode" id="statsTableInner">
+<div id="statsHeader"></div>
+<div id="statsTable"></div>
+</div></div>
+</div>
 </div>
 </section>
 <section id="leaderboardView" class="view">
@@ -1055,6 +1075,7 @@ const MAX_PRIORITY_PLAYERS = 4;
 let editingId = null; // track which player is being edited
 let editTableMode = false;
 let sortState = { col: null, dir: 1 };
+let statsSortState = { col: null, dir: 1 };
 let selectedGender = "M";
 let customDefaults = JSON.parse(localStorage.getItem("courtmixer_custom_defaults") || "null");
 
@@ -1782,6 +1803,66 @@ updateMatchToolbar();
 document.querySelector('[data-view="matchView"]')?.click();
 }
 
+function inferCategoryFromPlayers(ps) {
+const gs = ps.map(p => (p && p.gender === "F") ? "F" : "M");
+if (gs.every(g => g === "M")) return "MD";
+if (gs.every(g => g === "F")) return "WD";
+return "XD";
+}
+function computeCategoryCounts() {
+const counts = {};
+players.forEach(p => { counts[p.id] = { MD: 0, WD: 0, XD: 0 }; });
+history.forEach(h => {
+if (!h.pairAIds || h.pairAIds.length < 2 || !h.pairBIds || h.pairBIds.length < 2) return;
+const ids = [...h.pairAIds, ...h.pairBIds];
+let cat = h.category;
+if (cat !== "MD" && cat !== "WD" && cat !== "XD") cat = inferCategoryFromPlayers(ids.map(byId));
+ids.forEach(id => { if (counts[id]) counts[id][cat]++; });
+});
+return counts;
+}
+function bindStatsSortHandlers() {
+document.querySelectorAll('#statsHeader .col-sort').forEach(el => {
+el.onclick = () => {
+const col = el.dataset.sort;
+if (statsSortState.col === col) statsSortState.dir = -statsSortState.dir;
+else { statsSortState.col = col; statsSortState.dir = 1; }
+renderMatchStats();
+};
+});
+}
+function renderMatchStats() {
+const headerBox = document.getElementById("statsHeader");
+const table = document.getElementById("statsTable");
+if (!headerBox || !table) return;
+const counts = computeCategoryCounts();
+const arrow = (col) => statsSortState.col === col ? (statsSortState.dir === 1 ? " ▲" : " ▼") : "";
+headerBox.innerHTML = `<div class="header-row"><div>#</div><div class="col-sort" data-sort="name">Name${arrow("name")}</div><div class="col-mf col-sort" data-sort="gender">M/F${arrow("gender")}</div><div class="col-games col-sort" data-sort="matches">GP${arrow("matches")}</div><div class="col-games col-sort" data-sort="md">MD${arrow("md")}</div><div class="col-games col-sort" data-sort="wd">WD${arrow("wd")}</div><div class="col-games col-sort" data-sort="xd">XD${arrow("xd")}</div></div>`;
+let list = [...players];
+const c = statsSortState.col, dir = statsSortState.dir;
+if (c) {
+list.sort((a, b) => {
+if (c === "name") { const av = a.name.toLowerCase(), bv = b.name.toLowerCase(); return av < bv ? -dir : av > bv ? dir : 0; }
+if (c === "gender") { const av = (a.gender || ""), bv = (b.gender || ""); return av < bv ? -dir : av > bv ? dir : 0; }
+if (c === "matches") return (a.matches - b.matches) * dir;
+if (c === "md") return (counts[a.id].MD - counts[b.id].MD) * dir;
+if (c === "wd") return (counts[a.id].WD - counts[b.id].WD) * dir;
+if (c === "xd") return (counts[a.id].XD - counts[b.id].XD) * dir;
+return 0;
+});
+}
+table.innerHTML = "";
+list.forEach((p, idx) => {
+const g = (p.gender === "F") ? "F" : "M";
+const cc = counts[p.id] || { MD: 0, WD: 0, XD: 0 };
+const row = document.createElement("div");
+row.className = "row";
+row.innerHTML = `<div>${idx + 1}</div><div class="name">${p.name}</div><div class="col-mf gender-${g}">${g}</div><div class="col-games">${p.matches}</div><div class="col-games">${cc.MD}</div><div class="col-games">${cc.WD}</div><div class="col-games">${cc.XD}</div>`;
+table.appendChild(row);
+});
+bindStatsSortHandlers();
+}
+
 function doConfirmCourt(courtNum) {
 const ids = courtSlots[courtNum];
 if (ids.some(x => !x)) return alert("Fill all four slots before confirming this court.");
@@ -1795,6 +1876,7 @@ seenPairings.add(key);
 const isMex = matchmakingMode === "mexicano";
 const avgA = isMex ? (a[0].points + a[1].points) / 2 : (a[0].skill + a[1].skill) / 2;
 const avgB = isMex ? (b[0].points + b[1].points) / 2 : (b[0].skill + b[1].skill) / 2;
+const category = (courtMode[courtNum] === "MD" || courtMode[courtNum] === "WD" || courtMode[courtNum] === "XD") ? courtMode[courtNum] : inferCategoryFromPlayers([...a, ...b]);
 history.push({
 id: crypto.randomUUID(),
 time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -1807,7 +1889,8 @@ repeated: repeated,
 scoreA: null,
 scoreB: null,
 closed: false,
-court: courtCount > 1 ? courtNum : null
+court: courtCount > 1 ? courtNum : null,
+category: category
 });
 courtSlots[courtNum] = [null, null, null, null];
 courtSlotManual[courtNum] = [false, false, false, false];
@@ -2252,7 +2335,7 @@ const least = [...players].sort((a,b) => a.matches - b.matches)[0];
 const avgDelta = history.length
 ? (history.reduce((acc, h) => acc + h.pairDelta, 0) / history.length).toFixed(2)
 : "n/a";
-stats.innerHTML = `<span>Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong></span><span style="margin-left:auto;display:inline-flex;gap:8px;align-items:center;"><button id="histExportBtn" class="small secondary" title="Export a backup" style="padding:6px 12px;font-size:12px;">Export</button><button id="histImportBtn" class="small secondary" title="Import a backup" style="padding:6px 12px;font-size:12px;">Import</button><button id="saveAllBtn" class="small save-btn" title="Save all scores at once" style="padding:6px 12px;font-size:12px;">Save All</button></span>`;
+stats.innerHTML = `<span>Most played: <strong>${most.name} (${most.matches})</strong> | Least played: <strong>${least.name} (${least.matches})</strong> | Avg pair delta: <strong>${avgDelta}</strong></span><span style="margin-left:auto;display:inline-flex;gap:8px;align-items:center;"><button id="histExportBtn" class="small secondary" title="Export a backup" style="padding:6px 12px;font-size:12px;">Export</button><button id="histImportBtn" class="small secondary" title="Import a backup" style="padding:6px 12px;font-size:12px;">Import</button><button id="saveAllBtn" class="small save-btn" title="Save all scores at once" style="padding:6px 12px;font-size:12px;">Save Scores</button></span>`;
 const histExp = document.getElementById("histExportBtn"); if (histExp) histExp.onclick = exportBackup;
 const histImp = document.getElementById("histImportBtn"); if (histImp) histImp.onclick = () => { const fi = document.getElementById("importFile"); if (fi) fi.click(); };
 const saveAllBtn = document.getElementById("saveAllBtn");
@@ -2410,6 +2493,7 @@ deleteMatch(btn.dataset.hid);
 });
 
 renderStats();
+renderMatchStats();
 }
 
 function computeFunFacts() {
@@ -2810,6 +2894,18 @@ document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
 document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
 tab.classList.add("active");
 document.getElementById(tab.dataset.view).classList.add("active");
+if (tab.dataset.view === "historyView") renderMatchStats();
+};
+});
+
+document.querySelectorAll('#historySubtabs .subtab').forEach(btn => {
+btn.onclick = () => {
+document.querySelectorAll('#historySubtabs .subtab').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('#historyView .subview').forEach(v => v.classList.remove('active'));
+btn.classList.add('active');
+const pane = document.getElementById(btn.dataset.subview);
+if (pane) pane.classList.add('active');
+if (btn.dataset.subview === 'matchStatsPane') renderMatchStats();
 };
 });
 
